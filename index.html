@@ -129,6 +129,8 @@
   .map-load{position:relative;z-index:2;margin-top:64px;padding:9px 14px;border:1px solid var(--mint);background:rgba(11,18,32,.85);color:var(--mint);font-family:var(--mono);font-size:12px;border-radius:8px;cursor:pointer}
   .map-note{position:absolute;top:10px;left:12px;font-family:var(--mono);font-size:10px;color:#7f8ca6;z-index:2}
   .map.loaded{height:260px}
+  .map #kmap{position:absolute;inset:0}
+  .kov{background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:6px;white-space:nowrap;transform:translateY(-46px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
   .map.loaded .pin,.map.loaded .map-load,.map.loaded .map-note,.map.loaded .coord{display:none}
   .map .pin{position:absolute;top:calc(50% - 38px);width:16px;height:16px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(61,219,184,.6);animation:ping 2s infinite}
   .map .coord{position:absolute;bottom:10px;left:12px;font-family:var(--mono);font-size:10px;color:#7f8ca6}
@@ -247,7 +249,7 @@
     <h2>오시는 길</h2>
     <div class="venue-name" id="venueName"></div>
     <div class="venue-addr" id="venueAddr"></div>
-    <div class="map" id="map"><div class="map-note">EXTERNAL RESOURCE · BLOCKED</div><div class="pin"></div><button class="map-load" id="mapLoad">🔓 지도 불러오기 (Google Maps 연결 승인)</button><div class="coord" id="coord"></div></div>
+    <div class="map" id="map"><div class="map-note">EXTERNAL RESOURCE · BLOCKED</div><div class="pin"></div><button class="map-load" id="mapLoad">🔓 지도 불러오기 (외부 지도 연결 승인)</button><div class="coord" id="coord"></div></div>
     <div class="navbtns" id="navbtns"></div>
     <dl class="transit" id="transit"></dl>
   </section>
@@ -328,6 +330,9 @@ const CONFIG = {
     bride: [ { who: '신부', bank: '○○은행', num: '000-0000-0000-00' },
              { who: '신부 어머니', bank: '○○은행', num: '000-0000-0000-00' } ],
   },
+
+  // 카카오맵 JavaScript 키 (developers.kakao.com). 비워두면 구글 지도 임베드로 대체됩니다.
+  kakaoJsKey: '',
 
   // 배경음악: audio/ 폴더에 mp3를 넣고 경로 입력. 비워두면 BGM 버튼이 숨겨집니다.
   bgm: '',        // 예: 'audio/bgm.mp3'
@@ -518,12 +523,33 @@ $('#navbtns').innerHTML =
   `<a href="https://map.naver.com/p/search/${mq}" target="_blank" rel="noopener">네이버지도</a>`+
   `<a href="https://map.kakao.com/link/search/${mq}" target="_blank" rel="noopener">카카오맵</a>`+
   `<a href="https://www.google.com/maps/search/?api=1&query=${mq}" target="_blank" rel="noopener">구글지도</a>`;
-$('#mapLoad').onclick=()=>{
+function googleMap(){
   const f=document.createElement('iframe');
   f.src=`https://maps.google.com/maps?q=${mq}&z=17&hl=ko&output=embed`;
   f.title='예식장 위치 지도'; f.loading='lazy'; f.referrerPolicy='no-referrer';
   const m=$('#map'); m.appendChild(f); m.classList.add('loaded');
-};
+}
+function kakaoMap(){
+  const m=$('#map'), btn=$('#mapLoad');
+  btn.textContent='⏳ 보안 채널 연결 중…'; btn.disabled=true;
+  const sc=document.createElement('script');
+  sc.src=`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(CONFIG.kakaoJsKey)}&autoload=false&libraries=services`;
+  sc.onerror=()=>googleMap();                      // 키/도메인 문제 시 구글 지도로 대체
+  sc.onload=()=>kakao.maps.load(()=>{
+    const box=document.createElement('div'); box.id='kmap'; m.appendChild(box); m.classList.add('loaded');
+    const map=new kakao.maps.Map(box,{center:new kakao.maps.LatLng(37.5404,127.0700),level:3});
+    new kakao.maps.services.Geocoder().addressSearch(V.mapQuery,(r,st)=>{
+      if(st!==kakao.maps.services.Status.OK) return;
+      const pos=new kakao.maps.LatLng(r[0].y,r[0].x);
+      map.setCenter(pos); map.relayout(); map.setCenter(pos);
+      new kakao.maps.Marker({map,position:pos});
+      new kakao.maps.CustomOverlay({map,position:pos,yAnchor:1,content:`<div class="kov">${V.name.replace(/ B1층$/,'')}</div>`});
+    });
+    map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  });
+  document.head.appendChild(sc);
+}
+$('#mapLoad').onclick=()=> CONFIG.kakaoJsKey ? kakaoMap() : googleMap();
 $('#transit').innerHTML = V.transit.map(([k,v])=>`<dt><span>${k}</span></dt><dd>${v}</dd>`).join('');
 
 /* ── Contacts ── */
