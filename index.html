@@ -98,6 +98,21 @@
   .parents b{font-weight:700;color:var(--ink)}
 
   /* ───── Certificate ───── */
+  .log-wrap{background:var(--paper)}
+  .glog{background:var(--navy);border-radius:14px;padding:20px 18px;text-align:left;font-family:var(--mono);font-size:12px;line-height:1.7;color:#cfd8e8;box-shadow:0 12px 30px rgba(11,18,32,.15)}
+  .glog .cmd{color:#5d6b85;margin-bottom:10px}
+  .glog .c{display:grid;grid-template-columns:14px 1fr;column-gap:8px;margin-bottom:12px}
+  .glog .c:last-child{margin-bottom:0}
+  .glog .g{color:var(--mint);position:relative}
+  .glog .c:not(:last-child) .g::after{content:'';position:absolute;left:3px;top:20px;bottom:-14px;width:1px;background:#2c3b5e}
+  .glog .h{color:var(--gold)} .glog .ref{color:var(--mint)} .glog .d{color:#7f8ca6;font-size:11px}
+  .glog .m{color:#fff;font-family:var(--sans);font-size:14px}
+  .glog .pending .m{color:#cfd8e8}
+  .uptime{margin-top:18px;display:flex;justify-content:center;gap:10px}
+  .uptime .u{background:#fff;border:1px solid #e3ded3;border-radius:12px;padding:12px 14px;min-width:120px}
+  .uptime .u b{display:block;font-family:var(--mono);font-size:22px;color:var(--ink)}
+  .uptime .u span{font-size:12px;color:var(--muted)}
+  .ufoot{margin-top:10px;font-size:11px;color:var(--muted)}
   .cert-wrap{background:var(--navy)}
   .cert-wrap h2{color:#fff}
   @property --ga{syntax:'<angle>';inherits:false;initial-value:0deg}
@@ -301,6 +316,14 @@
     <div class="parents reveal" id="parents"></div>
   </section>
 
+  <!-- ═════════ GIT LOG ═════════ -->
+  <section class="log-wrap">
+    <div class="label">Commit History</div>
+    <h2>우리의 커밋 로그</h2>
+    <div class="glog reveal" id="glog"></div>
+    <div class="uptime reveal" id="uptime"></div>
+  </section>
+
   <!-- ═════════ CERTIFICATE ═════════ -->
   <section class="cert-wrap">
     <div class="label">X.509 · Marriage Certificate</div>
@@ -445,6 +468,11 @@ const CONFIG = {
     bride: [ { who: '신부', bank: '○○은행', num: '000-0000-0000-00' },
              { who: '신부 어머니', bank: '○○은행', num: '000-0000-0000-00' } ],
   },
+
+  // 연애 스토리 (git log). 오래된 순서로 추가. type: init / feat / fix / chore 등
+  story: [
+    { date:'2021-06-20', type:'init', msg:'우리의 시작' },
+  ],
 
   // 배경음악: audio/ 폴더에 mp3를 넣고 경로 입력. 비워두면 BGM 버튼이 숨겨집니다.
   bgm: 'audio/bgm.mp3',   // ⚠ 임시 자작곡 — 원하는 곡으로 교체 가능
@@ -795,6 +823,26 @@ document.addEventListener('visibilitychange',()=>{     // 앱 전환·화면 꺼
   if(!CONFIG.bgm) return;
   if(document.hidden) bgm.pause(); else if(bgmWanted) bgm.play().catch(()=>{});
 });
+
+/* ── 연애 스토리 git log + uptime ── */
+(async function(){
+  const items=[...CONFIG.story].sort((x,y)=>x.date<y.date?-1:1);
+  const wd=CONFIG.date.slice(0,10), done=new Date()>=W;
+  const list=[{date:wd,type:'merge',msg:`${g.name} ↔ ${b.name} → main`,head:true,pending:!done},...items.slice().reverse()];
+  const hash=async t=>{ const h=await sha256(t); return h?h.slice(0,7):Math.random().toString(16).slice(2,9); };
+  let html='<div class="cmd">$ git log --graph --oneline --all</div>';
+  for(const it of list){
+    const h=await hash(it.date+it.msg);
+    const ref=it.head?` <span class="ref">(HEAD → main${it.pending?', scheduled':''})</span>`:(it===list[list.length-1]?' <span class="ref">(root)</span>':'');
+    html+=`<div class="c ${it.pending?'pending':''}"><span class="g">${it.pending?'◌':'●'}</span><div><span class="h">${h}</span>${ref}<br><span class="m">${it.type}: ${it.msg}</span><br><span class="d">${it.date.replace(/-/g,'.')}${it.pending?' · 배포 예정':''}</span></div></div>`;
+  }
+  $('#glog').innerHTML=html;
+  const start=new Date(items[0].date+'T00:00:00+09:00');
+  const today=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Seoul'})); today.setHours(0,0,0,0);
+  const days=Math.floor((today-new Date(start.toLocaleString('en-US',{timeZone:'Asia/Seoul'})))/86400000)+1;
+  $('#uptime').innerHTML=`<div class="u"><b>${days.toLocaleString()}</b><span>함께한 날 (uptime)</span></div><div class="u"><b>100%</b><span>가용성 · 장애 0건*</span></div>`;
+  $('#uptime').insertAdjacentHTML('afterend','<div class="ufoot">* 사소한 다툼은 모두 24시간 내 복구됨</div>');
+})();
 
 /* ── 캘린더 저장 (.ics / Google) ── */
 (function(){
