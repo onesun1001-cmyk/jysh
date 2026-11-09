@@ -1,0 +1,12 @@
+# 🔐 Security Policy — 박상현 ♥ 윤지윤 Wedding Invitation
+# RFC 9116 형식을 따른 (진지한 척하는) 보안 정책입니다.
+
+Contact: https://onesun1001-cmyk.github.io/jysh/#contact
+Expires: 2027-02-14T00:00:00+09:00
+Preferred-Languages: ko, en
+Canonical: https://onesun1001-cmyk.github.io/jysh/.well-known/security.txt
+
+# Scope        : 본 청첩장 전체 (봉랍 무결성 포함)
+# Out of scope : 신랑의 사랑 (이미 무한대로 검증됨)
+# Reward       : 유효한 제보 1건당 식권 1매
+# Disclosure   : 2027-02-13 12:00 KST, 하우스오브더라움에서 공개 서약

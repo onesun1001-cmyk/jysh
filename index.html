@@ -140,6 +140,8 @@
   @keyframes ftop{to{transform:rotateX(-90deg)}}
   @keyframes fbot{to{transform:rotateX(0)}}
   .fsep{font-family:var(--mono);color:var(--muted);font-size:18px;line-height:40px;align-self:flex-start}
+  .cal-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:22px}
+  .btn-cal{display:block;padding:12px 6px;border:1px solid #d8d2c4;border-radius:10px;background:#fff;color:var(--ink);font-size:12.5px;font-family:var(--sans);text-decoration:none;cursor:pointer}
   .cd-msg{margin-top:16px;font-size:14px;color:var(--muted)}
   .cd-msg b{color:var(--ink)}
 
@@ -316,6 +318,7 @@
     <div class="cal" id="cal"></div>
     <div class="countdown" id="countdown"></div>
     <div class="cd-msg" id="cdMsg"></div>
+    <div class="cal-btns"><button class="btn-cal" id="icsBtn">📅 내 캘린더에 저장</button><a class="btn-cal" id="gcalBtn" target="_blank" rel="noopener">구글 캘린더에 저장</a></div>
   </section>
 
   <!-- ═════════ GALLERY ═════════ -->
@@ -367,7 +370,7 @@
   </section>
 
   <!-- ═════════ CONTACT ═════════ -->
-  <section style="background:#efebe2">
+  <section id="contact" style="background:#efebe2">
     <div class="label">Authorized Contacts</div>
     <h2>연락하기</h2>
     <div class="contacts" id="contacts"></div>
@@ -792,6 +795,36 @@ document.addEventListener('visibilitychange',()=>{     // 앱 전환·화면 꺼
   if(!CONFIG.bgm) return;
   if(document.hidden) bgm.pause(); else if(bgmWanted) bgm.play().catch(()=>{});
 });
+
+/* ── 캘린더 저장 (.ics / Google) ── */
+(function(){
+  const end=new Date(W.getTime()+2*3600e3);
+  const z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const title=`${g.name} ♥ ${b.name} 결혼식`, loc=`${V.name}, ${V.address}`;
+  const desc=`평생 보안서약 체결식에 초대합니다.\n${location.href.split('#')[0]}`;
+  $('#icsBtn').onclick=()=>{
+    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//jysh//wedding//KO','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+      `UID:jysh-${z(W)}@onesun1001-cmyk.github.io`,`DTSTAMP:${z(new Date())}`,`DTSTART:${z(W)}`,`DTEND:${z(end)}`,
+      `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${desc.replace(/\n/g,'\\n').replace(/,/g,'\\,')}`,
+      'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY','DESCRIPTION:내일은 서약 배포일입니다 💍','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));
+    a.download='jysh-wedding.ics'; document.body.appendChild(a); a.click(); a.remove();
+    toast('✓ 일정 파일을 받았어요');
+  };
+  $('#gcalBtn').href='https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +`&text=${encodeURIComponent(title)}&dates=${z(W)}/${z(end)}&location=${encodeURIComponent(loc)}&details=${encodeURIComponent(desc)}`;
+})();
+
+/* ── 개발자도구 이스터에그 ── */
+console.log(`%c
+   ____  _____ ____ _   _ ____  _____
+  / ___|| ____/ ___| | | |  _ \\| ____|
+  \\___ \\|  _|| |   | | | | |_) |  _|
+   ___) | |__| |___| |_| |  _ <| |___
+  |____/|_____\\____|\\___/|_| \\_\\_____|  WEDDING
+`,'color:#3ddbb8;font-family:monospace');
+console.log('%c🔐 F12까지 여셨군요. 역시 보안인의 지인이시네요.','font-size:14px;color:#d9c08a');
+console.log('%c[BUG BOUNTY] 이 청첩장의 취약점을 찾으면 신랑에게 제보해 주세요.\n보상: 식권 1매 + 신랑의 진심 어린 감사 🙇\n정책: /.well-known/security.txt','color:#8a97b2');
 
 /* ── 금색 꽃가루 (Gold Confetti Burst) ── */
 function confettiBurst(){
