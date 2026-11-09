@@ -305,7 +305,7 @@ const CONFIG = {
 
   // images/ 폴더에 넣은 파일명. 비워두면 자리표시만 나옵니다.
   mainPhoto: '',               // 예: 'images/main.jpg'
-  photos: [],                  // 예: ['images/1.jpg','images/2.jpg', ...]
+  photos: Array.from({length:9},(_,i)=>`images/sample/${String(i+1).padStart(2,'0')}.jpg`),  // ⚠ 샘플 이미지 — 실제 사진으로 교체
 
   accounts: {
     groom: [ { who: '신랑', bank: '○○은행', num: '000-0000-0000-00' },
