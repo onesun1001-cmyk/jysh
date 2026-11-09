@@ -152,6 +152,15 @@
   footer{background:var(--navy);color:#5d6b85;font-family:var(--mono);font-size:10.5px;padding:36px 28px 48px;text-align:center;line-height:2}
   footer b{color:var(--mint);font-weight:400}
 
+  .bgm-btn{position:fixed;top:14px;right:max(14px,calc(50% - 220px + 14px));z-index:80;display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;border:1px solid rgba(61,219,184,.45);background:rgba(11,18,32,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--mint);font-family:var(--mono);font-size:11px;letter-spacing:.06em;cursor:pointer}
+  .bgm-btn[hidden]{display:none}
+  .bgm-btn .bars{display:flex;gap:2px;align-items:flex-end;height:11px}
+  .bgm-btn .bars i{width:2px;background:var(--mint);height:3px}
+  .bgm-btn.on .bars i{animation:eq .9s ease-in-out infinite}
+  .bgm-btn.on .bars i:nth-child(2){animation-delay:.2s}.bgm-btn.on .bars i:nth-child(3){animation-delay:.4s}
+  .bgm-btn:not(.on){color:#7f8ca6;border-color:#2a3550}
+  .bgm-btn:not(.on) .bars i{background:#7f8ca6}
+  @keyframes eq{0%,100%{height:3px}50%{height:11px}}
   .toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:8px;opacity:0;transition:all .3s;z-index:120;pointer-events:none}
   .toast.on{opacity:1;transform:translate(-50%,0)}
   .reveal{opacity:0;transform:translateY(18px);transition:opacity .9s ease, transform .9s ease}
@@ -276,6 +285,8 @@
 
 <div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
 <div class="toast" id="toast"></div>
+<audio id="bgm" loop preload="none" playsinline></audio>
+<button class="bgm-btn" id="bgmBtn" hidden aria-label="배경음악 켜기/끄기"><span class="bars"><i></i><i></i><i></i></span><span id="bgmLabel">BGM ON</span></button>
 
 <script>
 /* ════════════════════════════════════════════
@@ -316,6 +327,10 @@ const CONFIG = {
     bride: [ { who: '신부', bank: '○○은행', num: '000-0000-0000-00' },
              { who: '신부 어머니', bank: '○○은행', num: '000-0000-0000-00' } ],
   },
+
+  // 배경음악: audio/ 폴더에 mp3를 넣고 경로 입력. 비워두면 BGM 버튼이 숨겨집니다.
+  bgm: '',        // 예: 'audio/bgm.mp3'
+  bgmVolume: 0.5,
 
   rsvpUrl: '#',   // 구글폼 등 참석 회신 링크
 };
@@ -384,6 +399,7 @@ function finishBoot(){
   $('#boot').classList.add('done');
   document.body.style.overflow='';
   startHero();
+  bgmStart();
 }
 async function runBoot(){
   document.body.style.overflow='hidden';
@@ -516,6 +532,30 @@ $('#shareBtn').onclick = async ()=>{
 /* ── Scroll reveal ── */
 const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ── BGM ── */
+const bgm=$('#bgm'), bgmBtn=$('#bgmBtn');
+let bgmWanted=false;
+function bgmSet(on){
+  bgmWanted=on;
+  bgmBtn.classList.toggle('on',on);
+  $('#bgmLabel').textContent = on?'BGM ON':'BGM OFF';
+  if(on){
+    bgm.volume=0; const p=bgm.play();
+    if(p) p.then(()=>{ let v=0; const t=setInterval(()=>{ v=Math.min(CONFIG.bgmVolume,v+0.05); bgm.volume=v; if(v>=CONFIG.bgmVolume) clearInterval(t); },120); })
+           .catch(()=>{ bgmWanted=false; bgmBtn.classList.remove('on'); $('#bgmLabel').textContent='BGM OFF'; });
+  } else bgm.pause();
+}
+function bgmStart(){
+  if(!CONFIG.bgm) return;
+  bgm.src=CONFIG.bgm; bgmBtn.hidden=false;
+  bgmSet(true);                       // 복호화 버튼 탭(사용자 동작) 직후라 자동재생 차단에 걸리지 않음
+}
+bgmBtn.onclick=()=>bgmSet(!bgmWanted);
+document.addEventListener('visibilitychange',()=>{     // 앱 전환·화면 꺼짐 시 일시정지, 돌아오면 재개
+  if(!CONFIG.bgm) return;
+  if(document.hidden) bgm.pause(); else if(bgmWanted) bgm.play().catch(()=>{});
+});
 
 runBoot();
 </script>
