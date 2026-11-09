@@ -105,15 +105,6 @@
   .lightbox.on{display:flex}
   .lightbox img{max-width:100%;max-height:90vh}
 
-  /* ───── Policy (vows) ───── */
-  .policy{text-align:left;background:#fff;border:1px solid #e3ded3;border-radius:14px;padding:26px 22px}
-  .policy .doc-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);border-bottom:1px dashed #d8d2c4;padding-bottom:12px;margin-bottom:18px}
-  .policy .art{margin-bottom:16px}
-  .policy .art h4{font-size:14.5px;font-weight:700;margin-bottom:2px}
-  .policy .art p{font-size:14px;color:#4a5265;line-height:1.75}
-  .stamp{margin:22px 0 0 auto;width:86px;height:86px;border:2.5px solid #c0564b;border-radius:50%;color:#c0564b;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:13px;transform:rotate(-12deg);opacity:.85;line-height:1.3}
-  .stamp small{font-family:var(--mono);font-size:8px;font-weight:400}
-
   /* ───── Location ───── */
   .venue-name{font-family:var(--serif);font-size:19px;font-weight:600}
   .venue-addr{font-size:14px;color:var(--muted);margin:4px 0 22px}
@@ -230,17 +221,6 @@
     <div class="gallery" id="gallery"></div>
   </section>
 
-  <!-- ═════════ POLICY ═════════ -->
-  <section style="background:#efebe2">
-    <div class="label">Security Policy</div>
-    <h2>혼인 정보보호 정책</h2>
-    <div class="policy reveal">
-      <div class="doc-head"><span>문서번호 LOVE-POL-001</span><span>보안등급: 평생</span></div>
-      <div id="policy"></div>
-      <div class="stamp">승인<small>APPROVED</small></div>
-    </div>
-  </section>
-
   <!-- ═════════ LOCATION ═════════ -->
   <section>
     <div class="label">Access Point</div>
@@ -334,17 +314,6 @@ const CONFIG = {
 
   rsvpUrl: '#',   // 구글폼 등 참석 회신 링크
 };
-
-/* 혼인 정보보호 정책 (서약) */
-const POLICY = [
-  ['제1조 (목적)', '본 정책은 두 사람이 평생 서로의 가장 소중한 자산을 보호하기 위한 사항을 정한다.'],
-  ['제2조 (신뢰 원칙)', '세상에는 Zero Trust를, 서로에게는 Full Trust를 적용한다.'],
-  ['제3조 (가용성)', '서로가 필요할 때 언제나 응답한다. 목표 가용성 99.999%.'],
-  ['제4조 (무결성)', '거짓 없이 말하고, 약속은 변조 없이 지킨다.'],
-  ['제5조 (기밀성)', '서로의 비밀은 끝까지 지키되, 서로에게는 숨기지 않는다.'],
-  ['제6조 (침해사고 대응)', '다툼이 발생하면 24시간 이내 화해를 원칙으로 하며, 원인 분석보다 포옹을 우선한다.'],
-  ['제7조 (정기 점검)', '매년 결혼기념일에 사랑의 유효성을 점검하고 갱신한다. 유효기간은 없다.'],
-];
 
 /* ════════════════ 이하 동작 코드 ════════════════ */
 const $ = s => document.querySelector(s);
@@ -485,9 +454,6 @@ tick(); setInterval(tick,1000);
   gl.onclick=e=>{ const t=e.target.closest('.g'); if(!t||!CONFIG.photos[t.dataset.i]) return; $('#lbImg').src=CONFIG.photos[t.dataset.i]; $('#lightbox').classList.add('on'); };
   $('#lightbox').onclick=()=>$('#lightbox').classList.remove('on');
 })();
-
-/* ── Policy ── */
-$('#policy').innerHTML = POLICY.map(([t,p])=>`<div class="art"><h4>${t}</h4><p>${p}</p></div>`).join('');
 
 /* ── Location ── */
 const V=CONFIG.venue;
