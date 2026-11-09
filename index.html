@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>[SECURE] 저희 두 사람, 평생 보안서약을 체결합니다</title>
+<meta name="description" content="암호화된 초대장이 도착했습니다. 복호화하여 확인해 주세요.">
+<meta property="og:title" content="🔐 암호화된 초대장이 도착했습니다">
+<meta property="og:description" content="신랑 ○○○ ♥ 신부 ○○○ · 복호화하여 확인해 주세요">
+<meta property="og:type" content="website">
+<!-- og:image 는 배포 후 절대경로로 지정: https://<계정>.github.io/<저장소>/og.jpg -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b1220; --navy-2:#121b2f; --line:#24304a;
+    --mint:#3ddbb8; --mint-soft:#c9f3e8; --gold:#d9c08a;
+    --paper:#f7f4ee; --ink:#1b2335; --muted:#6b7385;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --serif:'Noto Serif KR',serif; --sans:'Noto Sans KR',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:#e9e5dc;font-family:var(--sans);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;word-break:keep-all}
+  .app{max-width:440px;margin:0 auto;background:var(--paper);min-height:100vh;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.08)}
+  .mono{font-family:var(--mono)}
+  section{padding:72px 28px;text-align:center;position:relative}
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--mint);text-transform:uppercase;margin-bottom:10px;display:inline-flex;gap:6px;align-items:center}
+  .label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
+  h2{font-family:var(--serif);font-weight:600;font-size:22px;margin-bottom:28px;color:var(--ink)}
+  .divider{width:1px;height:48px;background:linear-gradient(var(--mint),transparent);margin:0 auto}
+
+  /* ───── Boot screen ───── */
+  #boot{position:fixed;inset:0;background:var(--navy);z-index:100;display:flex;justify-content:center;transition:opacity .8s ease, visibility .8s}
+  #boot.done{opacity:0;visibility:hidden}
+  .boot-inner{width:100%;max-width:440px;padding:56px 26px 40px;display:flex;flex-direction:column;color:#cfe3dc}
+  .term{font-family:var(--mono);font-size:12.5px;line-height:1.9;flex:1}
+  .term .ok{color:var(--mint)} .term .dim{color:#5d6b85} .term .warn{color:var(--gold)}
+  .cursor{display:inline-block;width:7px;height:14px;background:var(--mint);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .granted{font-family:var(--mono);color:var(--mint);font-size:20px;letter-spacing:.2em;text-align:center;margin:24px 0 8px;opacity:0;transition:opacity .5s}
+  .granted.show{opacity:1;text-shadow:0 0 18px rgba(61,219,184,.6)}
+  .btn-open{margin:18px auto 0;display:block;width:100%;padding:16px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-family:var(--mono);font-size:14px;letter-spacing:.08em;border-radius:10px;cursor:pointer;opacity:0;transform:translateY(8px);transition:all .5s}
+  .btn-open.show{opacity:1;transform:none}
+  .btn-open:active{background:rgba(61,219,184,.12)}
+  .skip{position:absolute;top:18px;right:20px;background:none;border:0;color:#5d6b85;font-family:var(--mono);font-size:12px;cursor:pointer}
+
+  /* ───── Hero ───── */
+  .hero{padding:0;background:var(--navy);color:#fff}
+  .hero-photo{height:520px;position:relative;background:
+     radial-gradient(circle at 30% 20%,rgba(61,219,184,.25),transparent 55%),
+     radial-gradient(circle at 80% 80%,rgba(217,192,138,.25),transparent 50%),
+     linear-gradient(160deg,#1a2540,#0b1220);background-size:cover;background-position:center}
+  .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 45%,var(--navy))}
+  .hero-photo .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#5d6b85;font-family:var(--mono);font-size:12px;gap:10px}
+  .hero-text{position:relative;z-index:2;margin-top:-150px;padding:0 28px 64px;text-align:center}
+  .hero-date{font-family:var(--mono);font-size:13px;letter-spacing:.25em;color:var(--mint)}
+  .hero-names{font-family:var(--serif);font-size:30px;font-weight:600;margin:14px 0 8px;letter-spacing:.04em}
+  .hero-names .amp{color:var(--gold);font-size:22px;margin:0 10px}
+  .hero-sub{font-size:14px;color:#9aa6bd}
+  .hash-badge{display:inline-block;margin-top:22px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-family:var(--mono);font-size:10.5px;color:#7f8ca6}
+
+  /* ───── Greeting ───── */
+  .greet p{font-family:var(--serif);font-size:16px;line-height:2.1;color:#323a4d}
+  .enc-head{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:22px;word-break:break-all}
+  .parents{margin-top:36px;font-size:15px;line-height:2.2;color:#444c5e}
+  .parents b{font-weight:700;color:var(--ink)}
+
+  /* ───── Certificate ───── */
+  .cert-wrap{background:var(--navy)}
+  .cert-wrap h2{color:#fff}
+  .cert{background:var(--navy-2);border:1px solid var(--line);border-radius:14px;padding:22px 18px;text-align:left;font-family:var(--mono);font-size:11.5px;color:#cfd8e8;line-height:1.85;position:relative}
+  .cert::before{content:'-----BEGIN MARRIAGE CERTIFICATE-----';display:block;color:#5d6b85;font-size:10px;margin-bottom:12px}
+  .cert::after{content:'-----END MARRIAGE CERTIFICATE-----';display:block;color:#5d6b85;font-size:10px;margin-top:12px}
+  .cert .k{color:#7f8ca6}
+  .cert .v{color:#fff}
+  .cert .g{color:var(--gold)}
+  .cert .m{color:var(--mint)}
+  .cert .row{display:flex;gap:8px}
+  .cert .row .k{flex:0 0 108px}
+  .cert .fp{word-break:break-all;color:var(--mint);font-size:10.5px}
+  .verified{margin-top:18px;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--mint)}
+
+  /* ───── Calendar / countdown ───── */
+  .when-big{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:4px}
+  .when-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px 0;max-width:320px;margin:0 auto;font-size:14px}
+  .cal .dow{font-family:var(--mono);font-size:11px;color:var(--muted);padding-bottom:6px}
+  .cal .d{height:38px;display:flex;align-items:center;justify-content:center}
+  .cal .sun{color:#c0564b}
+  .cal .day-on{background:var(--navy);color:var(--mint);border-radius:50%;width:38px;margin:0 auto;font-weight:700;box-shadow:0 0 0 3px rgba(61,219,184,.25)}
+  .countdown{display:flex;justify-content:center;gap:10px;margin-top:32px}
+  .cd{background:var(--navy);color:#fff;border-radius:10px;width:66px;padding:10px 0}
+  .cd b{display:block;font-family:var(--mono);font-size:22px;color:var(--mint)}
+  .cd span{font-family:var(--mono);font-size:10px;color:#7f8ca6;letter-spacing:.1em}
+  .cd-msg{margin-top:16px;font-size:14px;color:var(--muted)}
+  .cd-msg b{color:var(--ink)}
+
+  /* ───── Gallery ───── */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .gallery .g{aspect-ratio:1;background:linear-gradient(135deg,#dfe7e4,#cfd8e8);background-size:cover;background-position:center;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#8a93a6;font-family:var(--mono);font-size:10px}
+  .lightbox{position:fixed;inset:0;background:rgba(5,9,18,.94);z-index:90;display:none;align-items:center;justify-content:center}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:100%;max-height:90vh}
+
+  /* ───── Policy (vows) ───── */
+  .policy{text-align:left;background:#fff;border:1px solid #e3ded3;border-radius:14px;padding:26px 22px}
+  .policy .doc-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);border-bottom:1px dashed #d8d2c4;padding-bottom:12px;margin-bottom:18px}
+  .policy .art{margin-bottom:16px}
+  .policy .art h4{font-size:14.5px;font-weight:700;margin-bottom:2px}
+  .policy .art p{font-size:14px;color:#4a5265;line-height:1.75}
+  .stamp{margin:22px 0 0 auto;width:86px;height:86px;border:2.5px solid #c0564b;border-radius:50%;color:#c0564b;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:13px;transform:rotate(-12deg);opacity:.85;line-height:1.3}
+  .stamp small{font-family:var(--mono);font-size:8px;font-weight:400}
+
+  /* ───── Location ───── */
+  .venue-name{font-family:var(--serif);font-size:19px;font-weight:600}
+  .venue-addr{font-size:14px;color:var(--muted);margin:4px 0 22px}
+  .map{height:200px;border-radius:12px;background:
+    linear-gradient(var(--line) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/24px 24px, var(--navy);
+    position:relative;display:flex;align-items:center;justify-content:center;opacity:.95;overflow:hidden}
+  .map .pin{width:16px;height:16px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(61,219,184,.6);animation:ping 2s infinite}
+  .map .coord{position:absolute;bottom:10px;left:12px;font-family:var(--mono);font-size:10px;color:#7f8ca6}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,219,184,.6)}100%{box-shadow:0 0 0 34px rgba(61,219,184,0)}}
+  .navbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .navbtns a{padding:12px 0;border:1px solid #d8d2c4;border-radius:10px;font-size:13px;color:var(--ink);text-decoration:none;background:#fff}
+  .transit{text-align:left;margin-top:26px;font-size:14px;color:#4a5265}
+  .transit dt{font-weight:700;color:var(--ink);margin-top:14px;font-size:14px}
+  .transit dt span{font-family:var(--mono);font-size:10px;color:var(--mint);background:var(--navy);padding:2px 6px;border-radius:4px;margin-right:6px}
+
+  /* ───── Accounts ───── */
+  .acc-group{margin-bottom:12px;border:1px solid #e3ded3;border-radius:12px;background:#fff;overflow:hidden;text-align:left}
+  .acc-group summary{list-style:none;padding:16px 18px;cursor:pointer;display:flex;justify-content:space-between;font-weight:500;font-size:15px}
+  .acc-group summary::-webkit-details-marker{display:none}
+  .acc-group summary .lock{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .acc-group[open] summary .lock{color:var(--mint)}
+  .acc{padding:14px 18px;border-top:1px solid #f0ece3;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .acc .who{font-size:13px;color:var(--muted)}
+  .acc .num{font-family:var(--mono);font-size:13.5px;color:var(--ink)}
+  .acc button{flex:0 0 auto;border:1px solid var(--navy);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:7px;cursor:pointer}
+
+  /* ───── Contacts / RSVP / Footer ───── */
+  .contacts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .contact{background:#fff;border:1px solid #e3ded3;border-radius:12px;padding:16px 10px}
+  .contact .role{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.1em}
+  .contact .nm{font-weight:700;margin:2px 0 10px}
+  .contact a{display:inline-block;margin:0 4px;font-size:12px;color:var(--ink);text-decoration:none;border:1px solid #d8d2c4;padding:5px 10px;border-radius:999px}
+  .btn-main{display:block;width:100%;padding:16px;background:var(--navy);color:var(--mint);border:0;border-radius:12px;font-size:15px;font-family:var(--sans);font-weight:500;cursor:pointer;text-decoration:none;margin-top:10px}
+  .btn-sub{background:#fff;color:var(--ink);border:1px solid #d8d2c4}
+  footer{background:var(--navy);color:#5d6b85;font-family:var(--mono);font-size:10.5px;padding:36px 28px 48px;text-align:center;line-height:2}
+  footer b{color:var(--mint);font-weight:400}
+
+  .toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:8px;opacity:0;transition:all .3s;z-index:120;pointer-events:none}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .9s ease, transform .9s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ═════════ BOOT / HANDSHAKE ═════════ -->
+<div id="boot" role="dialog" aria-label="초대장 여는 중">
+  <button class="skip" id="skipBtn">SKIP ›</button>
+  <div class="boot-inner">
+    <div class="term" id="term"></div>
+    <div class="granted" id="granted">ACCESS GRANTED</div>
+    <button class="btn-open" id="openBtn">🔓 초대장 복호화하기</button>
+  </div>
+</div>
+
+<main class="app">
+
+  <!-- ═════════ HERO ═════════ -->
+  <section class="hero">
+    <div class="hero-photo" id="heroPhoto">
+      <div class="ph" id="heroPh"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>MAIN PHOTO · images/main.jpg</div>
+    </div>
+    <div class="hero-text">
+      <div class="hero-date" data-decrypt id="heroDate"></div>
+      <div class="hero-names"><span data-decrypt id="heroGroom"></span><span class="amp">&amp;</span><span data-decrypt id="heroBride"></span></div>
+      <div class="hero-sub" id="heroVenue"></div>
+      <div class="hash-badge" id="heroHash">sha256: computing…</div>
+    </div>
+  </section>
+
+  <!-- ═════════ GREETING ═════════ -->
+  <section class="greet">
+    <div class="label">Decrypted Message</div>
+    <h2>초대합니다</h2>
+    <div class="enc-head" id="encHead">AES-256-GCM · key = 두 사람의 마음</div>
+    <div class="reveal" id="greeting"></div>
+    <div class="parents reveal" id="parents"></div>
+  </section>
+
+  <!-- ═════════ CERTIFICATE ═════════ -->
+  <section class="cert-wrap">
+    <div class="label">X.509 · Marriage Certificate</div>
+    <h2>평생 인증서 발급 예정</h2>
+    <div class="cert reveal" id="cert"></div>
+    <div class="verified" id="verified">✓ 인증서 체인 검증 완료 · 양가 부모님 Root CA</div>
+  </section>
+
+  <!-- ═════════ WHEN ═════════ -->
+  <section>
+    <div class="label">Scheduled Deployment</div>
+    <h2>예식 일시</h2>
+    <div class="when-big" id="whenBig"></div>
+    <div class="when-sub" id="whenSub"></div>
+    <div class="cal" id="cal"></div>
+    <div class="countdown" id="countdown"></div>
+    <div class="cd-msg" id="cdMsg"></div>
+  </section>
+
+  <!-- ═════════ GALLERY ═════════ -->
+  <section style="padding-left:0;padding-right:0">
+    <div class="label">Audit Evidence</div>
+    <h2>우리의 기록</h2>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- ═════════ POLICY ═════════ -->
+  <section style="background:#efebe2">
+    <div class="label">Security Policy</div>
+    <h2>혼인 정보보호 정책</h2>
+    <div class="policy reveal">
+      <div class="doc-head"><span>문서번호 LOVE-POL-001</span><span>보안등급: 평생</span></div>
+      <div id="policy"></div>
+      <div class="stamp">승인<small>APPROVED</small></div>
+    </div>
+  </section>
+
+  <!-- ═════════ LOCATION ═════════ -->
+  <section>
+    <div class="label">Access Point</div>
+    <h2>오시는 길</h2>
+    <div class="venue-name" id="venueName"></div>
+    <div class="venue-addr" id="venueAddr"></div>
+    <div class="map"><div class="pin"></div><div class="coord" id="coord"></div></div>
+    <div class="navbtns" id="navbtns"></div>
+    <dl class="transit" id="transit"></dl>
+  </section>
+
+  <!-- ═════════ CONTACT ═════════ -->
+  <section style="background:#efebe2">
+    <div class="label">Authorized Contacts</div>
+    <h2>연락하기</h2>
+    <div class="contacts" id="contacts"></div>
+  </section>
+
+  <!-- ═════════ ACCOUNTS ═════════ -->
+  <section>
+    <div class="label">Encrypted Vault</div>
+    <h2>마음 전하실 곳</h2>
+    <p style="font-size:14px;color:var(--muted);margin:-14px 0 24px">탭하면 복호화됩니다.</p>
+    <div id="accounts"></div>
+  </section>
+
+  <!-- ═════════ RSVP / SHARE ═════════ -->
+  <section style="background:#efebe2">
+    <div class="label">Access Request</div>
+    <h2>참석 의사 전달</h2>
+    <p style="font-size:14px;color:var(--muted);margin:-14px 0 20px">원활한 준비를 위해 참석 여부를 알려주세요.</p>
+    <a class="btn-main" id="rsvpBtn" target="_blank" rel="noopener">접근 권한 신청 (참석 회신)</a>
+    <button class="btn-main btn-sub" id="shareBtn">초대장 공유하기</button>
+  </section>
+
+  <footer>
+    <div>This invitation is protected by <b>Love-256</b></div>
+    <div>개인정보 수집 0건 · 쿠키 0개 · 트래커 0개</div>
+    <div id="footHash"></div>
+  </footer>
+</main>
+
+<div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   ✏️  여기만 수정하면 됩니다 (CONFIG)
+   ════════════════════════════════════════════ */
+const CONFIG = {
+  groom: { name: '신랑이름', father: '신랑아버지', mother: '신랑어머니', order: '장남', phone: '010-0000-0000' },
+  bride: { name: '신부이름', father: '신부아버지', mother: '신부어머니', order: '장녀', phone: '010-0000-0000' },
+
+  // 예식 일시 (한국시간)
+  date: '2027-05-15T13:00:00+09:00',
+
+  venue: {
+    name: '○○웨딩홀 3층 그랜드홀',
+    address: '서울특별시 ○○구 ○○로 123',
+    lat: 37.5665, lng: 126.9780,
+    transit: [
+      ['SUBWAY', '○호선 ○○역 ○번 출구 도보 5분'],
+      ['BUS',    '간선 000, 000 · ○○정류장 하차'],
+      ['PARKING','건물 지하주차장 2시간 무료'],
+    ],
+  },
+
+  greeting: [
+    '서로의 가장 안전한 곳이 되어 주기로 했습니다.',
+    '',
+    '평생 유효한 신뢰를 약속하는 자리에',
+    '소중한 분들을 초대합니다.',
+    '오셔서 저희의 약속을 인증해 주세요.',
+  ],
+
+  // images/ 폴더에 넣은 파일명. 비워두면 자리표시만 나옵니다.
+  mainPhoto: '',               // 예: 'images/main.jpg'
+  photos: [],                  // 예: ['images/1.jpg','images/2.jpg', ...]
+
+  accounts: {
+    groom: [ { who: '신랑', bank: '○○은행', num: '000-0000-0000-00' },
+             { who: '신랑 아버지', bank: '○○은행', num: '000-0000-0000-00' } ],
+    bride: [ { who: '신부', bank: '○○은행', num: '000-0000-0000-00' },
+             { who: '신부 어머니', bank: '○○은행', num: '000-0000-0000-00' } ],
+  },
+
+  rsvpUrl: '#',   // 구글폼 등 참석 회신 링크
+};
+
+/* 혼인 정보보호 정책 (서약) */
+const POLICY = [
+  ['제1조 (목적)', '본 정책은 두 사람이 평생 서로의 가장 소중한 자산을 보호하기 위한 사항을 정한다.'],
+  ['제2조 (신뢰 원칙)', '세상에는 Zero Trust를, 서로에게는 Full Trust를 적용한다.'],
+  ['제3조 (가용성)', '서로가 필요할 때 언제나 응답한다. 목표 가용성 99.999%.'],
+  ['제4조 (무결성)', '거짓 없이 말하고, 약속은 변조 없이 지킨다.'],
+  ['제5조 (기밀성)', '서로의 비밀은 끝까지 지키되, 서로에게는 숨기지 않는다.'],
+  ['제6조 (침해사고 대응)', '다툼이 발생하면 24시간 이내 화해를 원칙으로 하며, 원인 분석보다 포옹을 우선한다.'],
+  ['제7조 (정기 점검)', '매년 결혼기념일에 사랑의 유효성을 점검하고 갱신한다. 유효기간은 없다.'],
+];
+
+/* ════════════════ 이하 동작 코드 ════════════════ */
+const $ = s => document.querySelector(s);
+const W = new Date(CONFIG.date);
+const DOW = ['일','월','화','수','목','금','토'];
+const pad = n => String(n).padStart(2,'0');
+const fmtDate = d => `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+const fmtTime = d => { const h=d.getHours(); return `${h<12?'오전':'오후'} ${h%12||12}시${d.getMinutes()?' '+d.getMinutes()+'분':''}`; };
+const toast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),1800); };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+async function sha256(text){
+  try{
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return null; }
+}
+
+/* 스크램블 복호화 효과 */
+const GLYPHS = '0123456789abcdef#$%&@!?*+=<>/\\';
+function decrypt(el, text, dur=1200){
+  if(reduced){ el.textContent=text; return; }
+  const start = performance.now();
+  (function frame(now){
+    const p = Math.min(1,(now-start)/dur);
+    const fixed = Math.floor(p*text.length);
+    let out='';
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      out += (i<fixed || c===' ') ? c : GLYPHS[Math.random()*GLYPHS.length|0];
+    }
+    el.textContent=out;
+    if(p<1) requestAnimationFrame(frame);
+  })(start);
+}
+
+/* ── Boot sequence ── */
+const BOOT = [
+  ['dim','$ ./open_invitation --secure'],
+  ['', 'Resolving host wedding.local …'],
+  ['', 'Initiating TLS 1.3 handshake …'],
+  ['ok','✓ Cipher suite: TLS_LOVE_WITH_AES_256_GCM_SHA384'],
+  ['', 'Verifying certificate chain …'],
+  ['ok','✓ Root CA: 양가 부모님 (trusted)'],
+  ['', 'Authenticating guest …'],
+  ['ok','✓ MFA passed: 소중한 분 ✓ 초대 대상 ✓'],
+  ['warn','! 1 encrypted invitation found'],
+];
+let booted = false;
+function finishBoot(){
+  if(booted) return; booted = true;
+  $('#boot').classList.add('done');
+  document.body.style.overflow='';
+  startHero();
+}
+async function runBoot(){
+  document.body.style.overflow='hidden';
+  const term = $('#term');
+  for(const [cls,line] of BOOT){
+    if(booted) return;
+    const div=document.createElement('div'); if(cls) div.className=cls;
+    term.appendChild(div);
+    for(let i=0;i<line.length;i++){ div.textContent=line.slice(0,i+1); await new Promise(r=>setTimeout(r, reduced?0:8)); }
+    await new Promise(r=>setTimeout(r, reduced?0:120));
+  }
+  const cur=document.createElement('span'); cur.className='cursor'; term.appendChild(cur);
+  $('#granted').classList.add('show');
+  setTimeout(()=>$('#openBtn').classList.add('show'),400);
+}
+$('#openBtn').onclick = finishBoot;
+$('#skipBtn').onclick = finishBoot;
+
+/* ── Hero ── */
+function startHero(){
+  decrypt($('#heroDate'), `${fmtDate(W)} ${['SUN','MON','TUE','WED','THU','FRI','SAT'][W.getDay()]} ${pad(W.getHours())}:${pad(W.getMinutes())}`, 1100);
+  decrypt($('#heroGroom'), CONFIG.groom.name, 1300);
+  decrypt($('#heroBride'), CONFIG.bride.name, 1500);
+}
+$('#heroVenue').textContent = CONFIG.venue.name;
+if(CONFIG.mainPhoto){ $('#heroPhoto').style.backgroundImage=`url('${CONFIG.mainPhoto}')`; $('#heroPh').remove(); }
+
+/* ── Greeting / parents ── */
+$('#greeting').innerHTML = CONFIG.greeting.map(l=>`<p>${l||'&nbsp;'}</p>`).join('');
+const g=CONFIG.groom, b=CONFIG.bride;
+$('#parents').innerHTML =
+  `${g.father} · ${g.mother} 의 ${g.order} <b>${g.name}</b><br>${b.father} · ${b.mother} 의 ${b.order} <b>${b.name}</b>`;
+
+/* ── Certificate ── */
+(async()=>{
+  const fp = await sha256(`${g.name}♥${b.name}@${CONFIG.date}`);
+  const fpTxt = fp ? fp.match(/.{2}/g).join(':').toUpperCase() : '(HTTPS 환경에서 계산됩니다)';
+  const serial = fp ? fp.slice(0,16).toUpperCase().match(/.{2}/g).join(':') : '01';
+  $('#heroHash').textContent = fp ? `sha256: ${fp.slice(0,8)}…${fp.slice(-8)}` : 'sha256: ♥';
+  $('#footHash').textContent = fp ? `integrity sha256-${fp.slice(0,24)}…` : '';
+  const R=(k,v,c='v')=>`<div class="row"><span class="k">${k}</span><span class="${c}">${v}</span></div>`;
+  $('#cert').innerHTML =
+    R('Version','3 (Forever)') +
+    R('Serial',serial,'m') +
+    R('Signature Alg','sha256With평생서약','g') +
+    R('Issuer','CN=양가 부모님, O=Family Root CA') +
+    R('Subject',`CN=${g.name} &amp; ${b.name}`) +
+    R('Not Before',`${fmtDate(W)} ${pad(W.getHours())}:${pad(W.getMinutes())} KST`,'m') +
+    R('Not After','∞ (No Expiration)','g') +
+    R('Key Usage','서로존중, 평생신뢰, 함께성장') +
+    R('Ext Key Usage','행복 (critical)','g') +
+    R('Witnesses','하객 여러분 (필수 서명)','m') +
+    `<div style="margin-top:10px" class="k">SHA-256 Fingerprint</div><div class="fp">${fpTxt}</div>`;
+})();
+
+/* ── When / calendar / countdown ── */
+$('#whenBig').textContent = `${W.getFullYear()}년 ${W.getMonth()+1}월 ${W.getDate()}일 ${DOW[W.getDay()]}요일`;
+$('#whenSub').textContent = `${fmtTime(W)} · ${CONFIG.venue.name}`;
+(function cal(){
+  const c=$('#cal'); let h=DOW.map((d,i)=>`<div class="dow ${i===0?'sun':''}">${d}</div>`).join('');
+  const first=new Date(W.getFullYear(),W.getMonth(),1).getDay();
+  const days=new Date(W.getFullYear(),W.getMonth()+1,0).getDate();
+  for(let i=0;i<first;i++) h+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const sun=(first+d-1)%7===0;
+    h+=`<div class="d ${sun?'sun':''} ${d===W.getDate()?'day-on':''}">${d}</div>`;
+  }
+  c.innerHTML=h;
+})();
+function tick(){
+  let s=Math.max(0,(W-new Date())/1000|0);
+  const d=s/86400|0; s%=86400; const h=s/3600|0; s%=3600; const m=s/60|0; s%=60;
+  $('#countdown').innerHTML=[[d,'DAYS'],[h,'HRS'],[m,'MIN'],[s,'SEC']].map(([v,l])=>`<div class="cd"><b>${pad(v)}</b><span>${l}</span></div>`).join('');
+  const dd = Math.ceil((new Date(W.getFullYear(),W.getMonth(),W.getDate()) - new Date(new Date().toDateString()))/86400000);
+  $('#cdMsg').innerHTML = dd>0 ? `평생 보안서약 체결까지 <b>D-${dd}</b>` : dd===0 ? '<b>오늘, 서약이 체결됩니다 🔐</b>' : `서약 체결 후 <b>${-dd}일</b>째 정상 운영 중`;
+}
+tick(); setInterval(tick,1000);
+
+/* ── Gallery ── */
+(function(){
+  const gl=$('#gallery'); const ps=CONFIG.photos.length?CONFIG.photos:Array(9).fill('');
+  gl.innerHTML = ps.map((p,i)=>`<div class="g" data-i="${i}" ${p?`style="background-image:url('${p}')"`:''}>${p?'':'EVIDENCE_'+pad(i+1)}</div>`).join('');
+  gl.onclick=e=>{ const t=e.target.closest('.g'); if(!t||!CONFIG.photos[t.dataset.i]) return; $('#lbImg').src=CONFIG.photos[t.dataset.i]; $('#lightbox').classList.add('on'); };
+  $('#lightbox').onclick=()=>$('#lightbox').classList.remove('on');
+})();
+
+/* ── Policy ── */
+$('#policy').innerHTML = POLICY.map(([t,p])=>`<div class="art"><h4>${t}</h4><p>${p}</p></div>`).join('');
+
+/* ── Location ── */
+const V=CONFIG.venue;
+$('#venueName').textContent=V.name; $('#venueAddr').textContent=V.address;
+$('#coord').textContent=`LAT ${V.lat.toFixed(4)} · LNG ${V.lng.toFixed(4)}`;
+const q=encodeURIComponent(V.name.split(' ')[0]);
+$('#navbtns').innerHTML =
+  `<a href="https://map.naver.com/p/search/${encodeURIComponent(V.address)}" target="_blank" rel="noopener">네이버지도</a>`+
+  `<a href="https://map.kakao.com/link/map/${q},${V.lat},${V.lng}" target="_blank" rel="noopener">카카오맵</a>`+
+  `<a href="https://apis.openapi.sk.com/tmap/app/routes?appKey=&name=${q}&lon=${V.lng}&lat=${V.lat}" target="_blank" rel="noopener">티맵</a>`;
+$('#transit').innerHTML = V.transit.map(([k,v])=>`<dt><span>${k}</span></dt><dd>${v}</dd>`).join('');
+
+/* ── Contacts ── */
+const tel=p=>p.replace(/[^0-9]/g,'');
+$('#contacts').innerHTML = [['GROOM',g],['BRIDE',b]].map(([r,p])=>
+  `<div class="contact"><div class="role">${r}</div><div class="nm">${p.name}</div><a href="tel:${tel(p.phone)}">전화</a><a href="sms:${tel(p.phone)}">문자</a></div>`).join('');
+
+/* ── Accounts (masked → decrypt on tap) ── */
+const mask=n=>n.replace(/[0-9]/g,'•');
+$('#accounts').innerHTML = [['신랑측','groom'],['신부측','bride']].map(([t,k])=>
+  `<details class="acc-group"><summary>${t} 계좌<span class="lock">🔒 LOCKED</span></summary>`+
+  CONFIG.accounts[k].map((a,i)=>`<div class="acc"><div><div class="who">${a.who} · ${a.bank}</div><div class="num" data-num="${a.num}">${mask(a.num)}</div></div><button data-copy="${a.bank} ${a.num}">복사</button></div>`).join('')+
+  `</details>`).join('');
+document.querySelectorAll('.acc-group').forEach(d=>d.addEventListener('toggle',()=>{
+  d.querySelector('.lock').textContent = d.open?'🔓 DECRYPTED':'🔒 LOCKED';
+  d.querySelectorAll('.num').forEach(n=> d.open ? decrypt(n,n.dataset.num,700) : n.textContent=mask(n.dataset.num));
+}));
+document.addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-copy]'); if(!btn) return;
+  try{ await navigator.clipboard.writeText(btn.dataset.copy); toast('✓ 클립보드에 복사되었습니다'); }
+  catch{ toast(btn.dataset.copy); }
+});
+
+/* ── RSVP / Share ── */
+$('#rsvpBtn').href = CONFIG.rsvpUrl;
+$('#shareBtn').onclick = async ()=>{
+  const data={title:document.title,text:`${g.name} ♥ ${b.name} 결혼합니다`,url:location.href};
+  if(navigator.share){ try{ await navigator.share(data); }catch{} }
+  else{ try{ await navigator.clipboard.writeText(location.href); toast('✓ 링크가 복사되었습니다'); }catch{ toast(location.href); } }
+};
+
+/* ── Scroll reveal ── */
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+runBoot();
+</script>
+</body>
+</html>
