@@ -286,16 +286,16 @@ const CONFIG = {
   bride: { name: '신부이름', father: '신부아버지', mother: '신부어머니', order: '장녀', phone: '010-0000-0000' },
 
   // 예식 일시 (한국시간)
-  date: '2027-05-15T13:00:00+09:00',
+  date: '2027-02-13T12:00:00+09:00',
 
   venue: {
-    name: '○○웨딩홀 3층 그랜드홀',
-    address: '서울특별시 ○○구 ○○로 123',
-    lat: 37.5665, lng: 126.9780,
+    name: '○○웨딩홀 B1층',                   // 예식장 이름 확정되면 수정
+    address: '서울특별시 광진구 능동로 81 B1층',
+    mapQuery: '서울특별시 광진구 능동로 81',   // 지도 앱 검색용 (층수 제외)
     transit: [
-      ['SUBWAY', '○호선 ○○역 ○번 출구 도보 5분'],
-      ['BUS',    '간선 000, 000 · ○○정류장 하차'],
-      ['PARKING','건물 지하주차장 2시간 무료'],
+      ['SUBWAY', '2·7호선 건대입구역 ○번 출구 도보 ○분'],
+      ['BUS',    '○○정류장 하차'],
+      ['PARKING','건물 주차장 이용 (무료 ○시간)'],
     ],
   },
 
@@ -477,12 +477,12 @@ $('#policy').innerHTML = POLICY.map(([t,p])=>`<div class="art"><h4>${t}</h4><p>$
 /* ── Location ── */
 const V=CONFIG.venue;
 $('#venueName').textContent=V.name; $('#venueAddr').textContent=V.address;
-$('#coord').textContent=`LAT ${V.lat.toFixed(4)} · LNG ${V.lng.toFixed(4)}`;
-const q=encodeURIComponent(V.name.split(' ')[0]);
+$('#coord').textContent=`ACCESS POINT · ${V.mapQuery.replace('서울특별시 ','')}`;
+const mq=encodeURIComponent(V.mapQuery);
 $('#navbtns').innerHTML =
-  `<a href="https://map.naver.com/p/search/${encodeURIComponent(V.address)}" target="_blank" rel="noopener">네이버지도</a>`+
-  `<a href="https://map.kakao.com/link/map/${q},${V.lat},${V.lng}" target="_blank" rel="noopener">카카오맵</a>`+
-  `<a href="https://apis.openapi.sk.com/tmap/app/routes?appKey=&name=${q}&lon=${V.lng}&lat=${V.lat}" target="_blank" rel="noopener">티맵</a>`;
+  `<a href="https://map.naver.com/p/search/${mq}" target="_blank" rel="noopener">네이버지도</a>`+
+  `<a href="https://map.kakao.com/link/search/${mq}" target="_blank" rel="noopener">카카오맵</a>`+
+  `<a href="https://www.google.com/maps/search/?api=1&query=${mq}" target="_blank" rel="noopener">구글지도</a>`;
 $('#transit').innerHTML = V.transit.map(([k,v])=>`<dt><span>${k}</span></dt><dd>${v}</dd>`).join('');
 
 /* ── Contacts ── */
