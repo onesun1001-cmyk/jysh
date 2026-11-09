@@ -54,6 +54,12 @@
      radial-gradient(circle at 80% 80%,rgba(217,192,138,.25),transparent 50%),
      linear-gradient(160deg,#1a2540,#0b1220);background-size:cover;background-position:center}
   .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 45%,var(--navy))}
+  #rain{position:absolute;inset:0;width:100%;height:100%;opacity:.16;pointer-events:none}
+  .boot-inner{position:relative;z-index:1}
+  .skip{z-index:2}
+  .hero-photo canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  #snow{z-index:3}
+  .hero-photo.revealed{transition:background-image 0s}
   .hero-photo .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#5d6b85;font-family:var(--mono);font-size:12px;gap:10px}
   .hero-text{position:relative;z-index:2;margin-top:-150px;padding:0 28px 64px;text-align:center}
   .hero-date{font-family:var(--mono);font-size:13px;letter-spacing:.25em;color:var(--mint)}
@@ -189,6 +195,7 @@
 
 <!-- ═════════ BOOT / HANDSHAKE ═════════ -->
 <div id="boot" role="dialog" aria-label="초대장 여는 중">
+  <canvas id="rain" aria-hidden="true"></canvas>
   <button class="skip" id="skipBtn">SKIP ›</button>
   <div class="boot-inner">
     <div class="term" id="term"></div>
@@ -202,6 +209,8 @@
   <!-- ═════════ HERO ═════════ -->
   <section class="hero">
     <div class="hero-photo" id="heroPhoto">
+      <canvas id="dotReveal" aria-hidden="true"></canvas>
+      <canvas id="snow" aria-hidden="true"></canvas>
       <div class="ph" id="heroPh"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>MAIN PHOTO · images/main.jpg</div>
     </div>
     <div class="hero-text">
@@ -354,7 +363,7 @@ const CONFIG = {
   ],
 
   // images/ 폴더에 넣은 파일명. 비워두면 자리표시만 나옵니다.
-  mainPhoto: '',               // 예: 'images/main.jpg'
+  mainPhoto: 'images/sample/main.jpg',   // ⚠ 샘플 — 실제 메인 사진으로 교체
   photos: Array.from({length:9},(_,i)=>`images/sample/${String(i+1).padStart(2,'0')}.jpg`),  // ⚠ 샘플 이미지 — 실제 사진으로 교체
 
   accounts: {
@@ -418,10 +427,25 @@ const BOOT = [
   ['ok','✓ MFA passed: 소중한 분 ✓ 초대 대상 ✓'],
   ['warn','! 1 encrypted invitation found'],
 ];
+/* ── Boot: ASCII Rain (은은한 배경) ── */
+const rain=(function(){
+  const cv=$('#rain'), ctx=cv.getContext('2d'); let raf, cols, drops, W, H, last=0;
+  const CH='0123456789abcdef♥ㅅㄹ<>/#$';
+  function size(){ W=cv.width=innerWidth; H=cv.height=innerHeight; cols=Math.floor(W/14); drops=Array.from({length:cols},()=>Math.random()*-H/14); }
+  function draw(now){
+    raf=requestAnimationFrame(draw); if(now-last<55) return; last=now;
+    ctx.fillStyle='rgba(11,18,32,.18)'; ctx.fillRect(0,0,W,H);
+    ctx.font='13px JetBrains Mono, monospace'; ctx.fillStyle='#3ddbb8';
+    drops.forEach((y,i)=>{ ctx.fillText(CH[Math.random()*CH.length|0],i*14,y*14); drops[i]= y*14>H && Math.random()>.975 ? 0 : y+1; });
+  }
+  if(!reduced){ size(); addEventListener('resize',size); raf=requestAnimationFrame(draw); }
+  return { stop(){ cancelAnimationFrame(raf); } };
+})();
 let booted = false;
 function finishBoot(){
   if(booted) return; booted = true;
   $('#boot').classList.add('done');
+  setTimeout(()=>rain.stop(),900);
   document.body.style.overflow='';
   startHero();
   bgmStart();
@@ -445,12 +469,75 @@ $('#skipBtn').onclick = finishBoot;
 
 /* ── Hero ── */
 function startHero(){
+  dotReveal();
   decrypt($('#heroDate'), `${fmtDate(W)} ${['SUN','MON','TUE','WED','THU','FRI','SAT'][W.getDay()]} ${pad(W.getHours())}:${pad(W.getMinutes())}`, 1100);
   decrypt($('#heroGroom'), CONFIG.groom.name, 1300);
   decrypt($('#heroBride'), CONFIG.bride.name, 1500);
 }
 $('#heroVenue').textContent = CONFIG.venue.name;
-if(CONFIG.mainPhoto){ $('#heroPhoto').style.backgroundImage=`url('${CONFIG.mainPhoto}')`; $('#heroPh').remove(); }
+/* ── Hero: 점 복호화(Dot Image Reveal) ── */
+let heroImg=null;
+if(CONFIG.mainPhoto){
+  $('#heroPh').remove();
+  heroImg=new Image(); heroImg.src=CONFIG.mainPhoto;
+}
+function dotReveal(){
+  const box=$('#heroPhoto'), cv=$('#dotReveal');
+  if(!heroImg) return;
+  const finish=()=>{ box.style.backgroundImage=`url('${CONFIG.mainPhoto}')`; cv.style.transition='opacity .8s'; cv.style.opacity=0; };
+  if(reduced){ finish(); return; }
+  const run=()=>{
+    const dpr=Math.min(2,devicePixelRatio||1), W=box.clientWidth, H=box.clientHeight;
+    cv.width=W*dpr; cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+    // cover-fit sample
+    const CELL=9, cols=Math.ceil(W/CELL), rows=Math.ceil(H/CELL);
+    const off=document.createElement('canvas'); off.width=cols; off.height=rows; const oc=off.getContext('2d');
+    const ir=heroImg.width/heroImg.height, br=W/H; let sw,sh,sx,sy;
+    if(ir>br){ sh=heroImg.height; sw=sh*br; sx=(heroImg.width-sw)/2; sy=0; } else { sw=heroImg.width; sh=sw/br; sx=0; sy=(heroImg.height-sh)/2; }
+    oc.drawImage(heroImg,sx,sy,sw,sh,0,0,cols,rows);
+    let px; try{ px=oc.getImageData(0,0,cols,rows).data; }catch(e){ finish(); return; }
+    const dots=[];
+    for(let y=0;y<rows;y++) for(let x=0;x<cols;x++){
+      const i=(y*cols+x)*4, d=Math.hypot(x-cols/2,y-rows*0.45)/Math.hypot(cols/2,rows/2);
+      dots.push({x:x*CELL+CELL/2,y:y*CELL+CELL/2,c:`rgb(${px[i]},${px[i+1]},${px[i+2]})`,t:d*0.9+Math.random()*0.35});
+    }
+    const T=1700, t0=performance.now();
+    (function frame(now){
+      const p=(now-t0)/T; ctx.clearRect(0,0,W,H);
+      for(const o of dots){
+        const k=Math.min(1,Math.max(0,(p*1.4-o.t)/0.35)); if(k<=0) continue;
+        const r=(CELL*0.75)*k;
+        ctx.fillStyle = k<0.5 ? '#3ddbb8' : o.c;
+        if(k<1){ ctx.beginPath(); ctx.arc(o.x,o.y,r/2+0.6,0,Math.PI*2); ctx.fill(); }
+        else ctx.fillRect(o.x-CELL/2,o.y-CELL/2,CELL+.5,CELL+.5);
+      }
+      if(p<1.25) requestAnimationFrame(frame); else finish();
+    })(t0);
+  };
+  heroImg.complete && heroImg.naturalWidth ? run() : (heroImg.onload=run, heroImg.onerror=finish);
+}
+
+/* ── Hero: 눈 내리기 (2월 예식) ── */
+(function snow(){
+  if(reduced) return;
+  const cv=$('#snow'), box=$('#heroPhoto'), ctx=cv.getContext('2d');
+  let W,H,flakes=[],on=false,raf;
+  const size=()=>{ const dpr=Math.min(2,devicePixelRatio||1); W=box.clientWidth; H=box.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); };
+  const mk=init=>({x:Math.random()*W,y:init?Math.random()*H:-6,r:Math.random()*2.2+.6,v:Math.random()*.5+.35,s:Math.random()*Math.PI*2,a:Math.random()*.5+.35});
+  size(); for(let i=0;i<70;i++) flakes.push(mk(true));
+  addEventListener('resize',size);
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const f of flakes){
+      f.y+=f.v; f.s+=.012; f.x+=Math.sin(f.s)*.35;
+      if(f.y>H+6){ Object.assign(f,mk(false)); }
+      ctx.globalAlpha=f.a; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1; raf=requestAnimationFrame(tick);
+  }
+  // 화면에 보일 때만 동작 (배터리 절약)
+  new IntersectionObserver(es=>{ const v=es[0].isIntersecting; if(v&&!on){on=true;tick();} else if(!v&&on){on=false;cancelAnimationFrame(raf);} }).observe(box);
+})();
 
 /* ── Greeting / parents ── */
 $('#greeting').innerHTML = CONFIG.greeting.map(l=>`<p>${l||'&nbsp;'}</p>`).join('');
