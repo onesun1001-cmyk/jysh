@@ -99,8 +99,21 @@
   .cd-msg b{color:var(--ink)}
 
   /* ───── Gallery ───── */
-  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-  .gallery .g{aspect-ratio:1;background:linear-gradient(135deg,#dfe7e4,#cfd8e8);background-size:cover;background-position:center;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#8a93a6;font-family:var(--mono);font-size:10px}
+  /* Coverflow (ported from Originkit Smooth3DSlideshow concept) */
+  .cf{position:relative;height:430px;perspective:1600px;overflow:hidden;outline:none;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .cf-stage{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+  .cf-card{position:absolute;left:0;top:0;width:260px;height:346px;border-radius:18px;overflow:hidden;background:var(--navy);
+    transform-style:preserve-3d;transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s cubic-bezier(.22,1,.36,1);cursor:pointer;
+    box-shadow:0 18px 40px rgba(11,18,32,.25)}
+  .cf-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .cf-card .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:#5d6b85}
+  .cf-card .dim{position:absolute;inset:0;background:#000;transition:opacity .6s cubic-bezier(.22,1,.36,1);pointer-events:none}
+  .cf-card .tag{position:absolute;left:12px;bottom:10px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.85);letter-spacing:.08em;text-shadow:0 1px 6px rgba(0,0,0,.5);transition:opacity .4s}
+  .cf-meta{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:4px}
+  .cf-meta button{width:38px;height:38px;border-radius:50%;border:1px solid #d8d2c4;background:#fff;color:var(--ink);font-size:18px;cursor:pointer;line-height:1}
+  .cf-count{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em;min-width:118px}
+  .cf-count b{color:var(--ink);font-weight:600}
+  .cf-hint{font-size:12px;color:var(--muted);margin-top:10px}
   .lightbox{position:fixed;inset:0;background:rgba(5,9,18,.94);z-index:90;display:none;align-items:center;justify-content:center}
   .lightbox.on{display:flex}
   .lightbox img{max-width:100%;max-height:90vh}
@@ -223,7 +236,9 @@
   <section style="padding-left:0;padding-right:0">
     <div class="label">Audit Evidence</div>
     <h2>우리의 기록</h2>
-    <div class="gallery" id="gallery"></div>
+    <div class="cf" id="cf" tabindex="0" role="group" aria-roledescription="carousel" aria-label="사진 갤러리"><div class="cf-stage" id="cfStage"></div></div>
+    <div class="cf-meta"><button id="cfPrev" aria-label="이전 사진">‹</button><span class="cf-count" id="cfCount"></span><button id="cfNext" aria-label="다음 사진">›</button></div>
+    <div class="cf-hint">옆으로 밀어서 넘기고, 가운데 사진을 누르면 크게 보여요</div>
   </section>
 
   <!-- ═════════ LOCATION ═════════ -->
@@ -453,12 +468,45 @@ function tick(){
 }
 tick(); setInterval(tick,1000);
 
-/* ── Gallery ── */
+/* ── Gallery: 3D coverflow ── */
 (function(){
-  const gl=$('#gallery'); const ps=CONFIG.photos.length?CONFIG.photos:Array(9).fill('');
-  gl.innerHTML = ps.map((p,i)=>`<div class="g" data-i="${i}" ${p?`style="background-image:url('${p}')"`:''}>${p?'':'EVIDENCE_'+pad(i+1)}</div>`).join('');
-  gl.onclick=e=>{ const t=e.target.closest('.g'); if(!t||!CONFIG.photos[t.dataset.i]) return; $('#lbImg').src=CONFIG.photos[t.dataset.i]; $('#lightbox').classList.add('on'); };
+  const photos=CONFIG.photos.length?CONFIG.photos:Array(5).fill('');
+  const n=photos.length, stage=$('#cfStage'), root=$('#cf');
+  const W_=260, H_=346, GAP=150, DEPTH=240, TILT=12, SIDE=8, STEP=.16, VIS=2, DIM=.4, DUR=600;
+  let active=0, lock=false;
+  stage.innerHTML=photos.map((p,i)=>`<div class="cf-card" data-i="${i}">${p?`<img src="${p}" alt="우리의 기록 ${i+1}" loading="${i<3?'eager':'lazy'}" draggable="false">`:`<div class="ph">EVIDENCE_${pad(i+1)}</div>`}<div class="tag">EVIDENCE_${pad(i+1)}</div><div class="dim"></div></div>`).join('');
+  const cards=[...stage.children];
+  function render(){
+    cards.forEach((c,i)=>{
+      let rel=i-active; if(rel>n/2) rel-=n; if(rel<-n/2) rel+=n;
+      const ax=Math.abs(rel), vis=ax<=VIS, sc=Math.max(.4,1-ax*STEP);
+      c.style.transform=`translate(-50%,-50%) translateX(${rel*GAP}px) translateZ(${-ax*DEPTH}px) rotateY(${-rel*TILT}deg) rotateZ(${rel*SIDE}deg) scale(${sc})`;
+      c.style.opacity=vis?1:0; c.style.pointerEvents=vis?'auto':'none';
+      c.style.zIndex=10-ax;
+      c.querySelector('.dim').style.opacity=rel===0?0:DIM;
+      c.querySelector('.tag').style.opacity=rel===0?1:0;
+      c.setAttribute('aria-hidden',!vis);
+    });
+    $('#cfCount').innerHTML=`EVIDENCE <b>${pad(active+1)}</b> / ${pad(n)}`;
+  }
+  function go(i){ if(lock) return; lock=true; setTimeout(()=>lock=false,DUR); active=((i%n)+n)%n; render(); }
+  const step=d=>go(active+d);
+  cards.forEach((c,i)=>c.cardIndex=i);
+  // tap: side card → bring to centre, centre card → open full view
+  let sx=0, sy=0, moved=false;
+  root.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; moved=false; });
+  root.addEventListener('pointerup',e=>{
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ moved=true; step(dx<0?1:-1); return; }
+    const card=e.target.closest('.cf-card'); if(!card) return;
+    const i=+card.dataset.i;
+    if(i===active){ if(CONFIG.photos[i]){ $('#lbImg').src=CONFIG.photos[i]; $('#lightbox').classList.add('on'); } }
+    else go(i);
+  });
+  root.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){e.preventDefault();step(1);} if(e.key==='ArrowLeft'){e.preventDefault();step(-1);} });
+  $('#cfPrev').onclick=()=>step(-1); $('#cfNext').onclick=()=>step(1);
   $('#lightbox').onclick=()=>$('#lightbox').classList.remove('on');
+  render();
 })();
 
 /* ── Location ── */
