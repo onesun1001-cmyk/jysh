@@ -81,11 +81,11 @@
 
   /* ───── Hero ───── */
   .hero{padding:0;background:var(--navy);color:#fff}
-  .hero-photo{height:520px;position:relative;background:
+  .hero-photo{height:600px;position:relative;background:
      radial-gradient(circle at 30% 20%,rgba(61,219,184,.25),transparent 55%),
      radial-gradient(circle at 80% 80%,rgba(217,192,138,.25),transparent 50%),
-     linear-gradient(160deg,#1a2540,#0b1220);background-size:cover;background-position:center}
-  .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 45%,var(--navy))}
+     linear-gradient(160deg,#1a2540,#0b1220);background-size:cover;background-position:center 22%}
+  .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(11,18,32,.75) 82%,var(--navy))}
   .boot-inner{position:relative;z-index:1}
   .skip{z-index:2}
   .hero-photo canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -414,8 +414,8 @@
    ✏️  여기만 수정하면 됩니다 (CONFIG)
    ════════════════════════════════════════════ */
 const CONFIG = {
-  groom: { name: '박상현', father: '박철원', mother: '조선영', order: '장남', phone: '010-0000-0000' },
-  bride: { name: '윤지윤', father: '윤용원', mother: '이혜란', order: '장녀', phone: '010-0000-0000' },
+  groom: { name: '박상현', father: '박철원', mother: '조선영', order: '장남', phone: '010-3047-9002' },
+  bride: { name: '윤지윤', father: '윤용원', mother: '이혜란', order: '장녀', phone: '010-4181-1442' },
 
   // 예식 일시 (한국시간)
   date: '2027-02-13T12:00:00+09:00',
@@ -439,7 +439,7 @@ const CONFIG = {
   ],
 
   // images/ 폴더에 넣은 파일명. 비워두면 자리표시만 나옵니다.
-  mainPhoto: 'images/sample/main.jpg',   // ⚠ 샘플 — 실제 메인 사진으로 교체
+  mainPhoto: 'images/main.jpg',
   photos: Array.from({length:9},(_,i)=>`images/sample/${String(i+1).padStart(2,'0')}.jpg`),  // ⚠ 샘플 이미지 — 실제 사진으로 교체
 
   accounts: {
@@ -547,7 +547,7 @@ function dotReveal(){
     const CELL=9, cols=Math.ceil(W/CELL), rows=Math.ceil(H/CELL);
     const off=document.createElement('canvas'); off.width=cols; off.height=rows; const oc=off.getContext('2d');
     const ir=heroImg.width/heroImg.height, br=W/H; let sw,sh,sx,sy;
-    if(ir>br){ sh=heroImg.height; sw=sh*br; sx=(heroImg.width-sw)/2; sy=0; } else { sw=heroImg.width; sh=sw/br; sx=0; sy=(heroImg.height-sh)/2; }
+    if(ir>br){ sh=heroImg.height; sw=sh*br; sx=(heroImg.width-sw)/2; sy=0; } else { sw=heroImg.width; sh=sw/br; sx=0; sy=(heroImg.height-sh)*0.22; }
     oc.drawImage(heroImg,sx,sy,sw,sh,0,0,cols,rows);
     let px; try{ px=oc.getImageData(0,0,cols,rows).data; }catch(e){ finish(); return; }
     const dots=[];
