@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>미리보기 B · 키 페어</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0b1220;--mint:#3ddbb8;--gold:#e8c98a;--mono:'JetBrains Mono',ui-monospace,monospace;--serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:radial-gradient(120% 80% at 50% 28%,#172340,#0b1220 70%);color:#cfd8e8;font-family:var(--sans);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+  .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .tag{position:fixed;top:16px;left:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:#5d6b85}
+  .cap{margin-top:26px;font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--mint);transition:color .6s;text-align:center;min-height:16px}
+  .sub{margin-top:9px;font-size:13.5px;color:#8a97b2;text-align:center;min-height:20px;transition:opacity .4s}
+  .done .cap{color:var(--gold)}
+  .names{font-family:var(--serif);font-size:20px;color:#fff;letter-spacing:.06em;margin-top:14px;opacity:0;transform:translateY(8px);transition:opacity .8s .3s,transform .8s .3s}
+  .names b{color:var(--gold);font-weight:400;margin:0 8px}
+  .done .names{opacity:1;transform:none}
+  .bar{position:fixed;left:0;right:0;bottom:22px;display:flex;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .5s .8s}
+  .done .bar{opacity:1;pointer-events:auto}
+  .bar a,.bar button{font-family:var(--sans);font-size:12.5px;color:#cfd8e8;background:rgba(255,255,255,.06);border:1px solid #2c3b5e;border-radius:999px;padding:9px 14px;text-decoration:none;cursor:pointer}
+
+  .kp{position:relative;width:260px;height:360px;cursor:grab}
+  .kp svg{position:absolute;left:0;top:0;width:260px;height:360px;overflow:visible}
+  .half{transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+  .kp.dragging .half{transition:none}
+  .half .glass{transition:fill-opacity .5s}
+  .lbl{font-family:var(--serif);font-weight:700;font-size:30px;text-anchor:middle;transition:opacity .4s}
+  .pk{font-family:var(--mono);font-size:9px;text-anchor:middle;letter-spacing:.06em;transition:opacity .3s}
+  .fuse{opacity:0;transition:opacity .5s .15s}
+  .merged .fuse{opacity:1}
+  .half{opacity:1}
+  .merged .half{opacity:0;transition:opacity .45s .1s}
+  .orbit{transform-origin:130px 180px;animation:spin 14s linear infinite;opacity:0;transition:opacity .8s .3s}
+  .merged .orbit{opacity:.9}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .heart{transform-origin:130px 180px;transform:scale(0);transition:transform .6s cubic-bezier(.3,1.6,.5,1) .25s}
+  .merged .heart{transform:scale(1);animation:beat 1.6s ease-in-out 1s infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .flash{opacity:0}
+  .merged .flash{animation:flash .7s ease-out}
+  @keyframes flash{0%{opacity:.9;r:20}100%{opacity:0;r:150}}
+  .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:34px;align-items:center;pointer-events:none;transition:opacity .3s}
+  .hint i{width:12px;height:12px;border-left:2px solid #8a97b2;border-top:2px solid #8a97b2;animation:nud 1.4s ease-in-out infinite}
+  .hint i:first-child{transform:rotate(225deg)} .hint i:last-child{transform:rotate(45deg)}
+  @keyframes nud{0%,100%{opacity:.25}50%{opacity:1}}
+  .kp.dragging .hint,.merged .hint{opacity:0}
+</style>
+</head>
+<body>
+<div class="tag">PREVIEW B · KEY PAIR</div>
+<div class="stage" id="stage">
+  <div class="kp" id="kp">
+    <svg viewBox="0 0 260 360" aria-hidden="true">
+      <defs>
+        <linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ff0d6"/><stop offset="1" stop-color="#1f9c84"/></linearGradient>
+        <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7e3ad"/><stop offset="1" stop-color="#b8923f"/></linearGradient>
+        <linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3ddbb8"/><stop offset="1" stop-color="#e8c98a"/></linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle class="orbit" cx="130" cy="180" r="104" fill="none" stroke="url(#gf)" stroke-width="1" stroke-dasharray="2 9"/>
+      <circle class="flash" cx="130" cy="180" r="20" fill="none" stroke="#fff" stroke-width="2"/>
+      <g class="half" id="hTop" filter="url(#glow)">
+        <path class="glass" id="pTop" fill="#3ddbb8" fill-opacity=".10" stroke="url(#gm)" stroke-width="2.2" stroke-linejoin="round"/>
+        <text class="lbl" x="130" y="150" fill="#aef5e4">SH</text>
+        <text class="pk" x="130" y="124" fill="#3ddbb8" opacity=".7">GROOM</text>
+      </g>
+      <g class="half" id="hBot" filter="url(#glow)">
+        <path class="glass" id="pBot" fill="#e8c98a" fill-opacity=".10" stroke="url(#gg)" stroke-width="2.2" stroke-linejoin="round"/>
+        <text class="lbl" x="130" y="232" fill="#f7e3ad">JY</text>
+        <text class="pk" x="130" y="252" fill="#e8c98a" opacity=".7">BRIDE</text>
+      </g>
+      <g class="fuse" filter="url(#glow)">
+        <circle cx="130" cy="180" r="80" fill="url(#gf)" fill-opacity=".10" stroke="url(#gf)" stroke-width="2.6"/>
+        <path class="heart" d="M130 206 c-22 -17 -30 -27 -30 -38 a15 15 0 0 1 30 -8 a15 15 0 0 1 30 8 c0 11 -8 21 -30 38z" fill="url(#gf)"/>
+      </g>
+    </svg>
+    <div class="hint"><i></i><i></i></div>
+  </div>
+  <div class="cap" id="cap">TWO KEYS DETECTED</div>
+  <div class="sub" id="sub">두 개의 키를 맞대어 주세요</div>
+  <div class="names">박상현<b>♥</b>윤지윤</div>
+  <div class="bar"><button id="again">↻ 다시 보기</button><a href="fingerprint.html">← A안 보기</a><a href="../">현재 버전</a></div>
+</div>
+<script>
+// 원형 토큰을 열쇠 톱니 모양 이음선으로 위/아래 두 조각으로 나눔
+const R=80, CX=130, CY=180;
+const TEETH=[[-80,0],[-56,0],[-48,-12],[-34,-12],[-28,8],[-12,8],[-6,-7],[10,-7],[16,13],[32,13],[38,-10],[52,-10],[58,0],[80,0]];
+const seamLR=TEETH.map(([x,y])=>`L${CX+x} ${CY+y}`).join(' '), seamRL=TEETH.slice().reverse().map(([x,y])=>`L${CX+x} ${CY+y}`).join(' ');
+document.getElementById('pTop').setAttribute('d',`M${CX-R} ${CY} A${R} ${R} 0 0 1 ${CX+R} ${CY} ${seamRL} Z`);
+document.getElementById('pBot').setAttribute('d',`M${CX+R} ${CY} A${R} ${R} 0 0 1 ${CX-R} ${CY} ${seamLR} Z`);
+const kp=document.getElementById('kp'), top_=document.getElementById('hTop'), bot=document.getElementById('hBot'), stage=document.getElementById('stage');
+const GAP=62; let off=GAP, drag=null, merged=false;
+function place(o){ off=o; top_.style.transform=`translateY(${-o}px)`; bot.style.transform=`translateY(${o}px)`; }
+place(GAP);
+function merge(){ if(merged) return; merged=true; kp.classList.remove('dragging'); place(0);
+  if(navigator.vibrate) try{navigator.vibrate([15,30,40]);}catch(_){}
+  setTimeout(()=>{ stage.classList.add('merged','done');
+    document.getElementById('cap').textContent='KEY PAIR GENERATED'; document.getElementById('sub').textContent='두 사람이 한 쌍이 되었습니다'; },330); }
+addEventListener('pointerdown',e=>{ if(merged||e.target.closest('.bar')) return; const r=kp.getBoundingClientRect();
+  drag={y0:e.clientY,dir:e.clientY<r.top+r.height/2?1:-1,moved:false,o0:off}; kp.classList.add('dragging'); });
+addEventListener('pointermove',e=>{ if(!drag||merged) return; const d=(e.clientY-drag.y0)*drag.dir;   // 위 조각은 아래로, 아래 조각은 위로 끌면 가까워짐
+  if(Math.abs(d)>6) drag.moved=true; const o=Math.max(0,Math.min(GAP,drag.o0-d)); if(o<=10) merge(); else place(o); });
+const end=()=>{ if(!drag) return; const d=drag; drag=null; kp.classList.remove('dragging'); if(merged) return; if(!d.moved) merge(); else place(GAP); };
+addEventListener('pointerup',end); addEventListener('pointercancel',end);
+document.getElementById('again').onclick=()=>{ merged=false; stage.classList.remove('merged','done'); place(GAP);
+  document.getElementById('cap').textContent='TWO KEYS DETECTED'; document.getElementById('sub').textContent='두 개의 키를 맞대어 주세요'; };
+</script>
+</body>
+</html>
