@@ -32,36 +32,31 @@
   h2{font-family:var(--serif);font-weight:600;font-size:22px;margin-bottom:28px;color:var(--ink)}
   .divider{width:1px;height:48px;background:linear-gradient(var(--mint),transparent);margin:0 auto}
 
-  /* ───── Wax seal envelope (opening) ───── */
-  #seal{position:fixed;inset:0;z-index:110;background:radial-gradient(120% 80% at 50% 30%,#16213a,#0b1220 70%);display:flex;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s}
+  /* ───── Padlock opening: drag the key up ───── */
+  #seal{touch-action:none;position:fixed;inset:0;z-index:110;background:radial-gradient(120% 80% at 50% 30%,#16213a,#0b1220 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s}
   #seal.gone{opacity:0;visibility:hidden}
-  .env-wrap{width:min(320px,82vw);text-align:center}
-  .env{position:relative;width:100%;aspect-ratio:3/2;perspective:900px;margin:0 auto}
-  .env .body{position:absolute;inset:0;border-radius:6px;background:linear-gradient(160deg,#f7f4ee,#e8e2d4);box-shadow:0 30px 60px rgba(0,0,0,.45)}
-  .env .body::before{content:'';position:absolute;inset:0;border-radius:6px;background:
-      linear-gradient(to top right,transparent 49.6%,rgba(0,0,0,.07) 50%,transparent 50.4%) left/50% 100% no-repeat,
-      linear-gradient(to top left,transparent 49.6%,rgba(0,0,0,.07) 50%,transparent 50.4%) right/50% 100% no-repeat}
-  .env .flap{position:absolute;left:0;right:0;top:0;height:62%;transform-origin:top;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.6,0,.3,1) .35s;z-index:2}
-  .env .flap::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#eee8db,#ddd5c4);clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.12))}
-  #seal.open .env .flap{transform:rotateX(180deg);z-index:0}
-  .wax{position:absolute;left:50%;top:62%;width:86px;height:86px;transform:translate(-50%,-50%);z-index:3;cursor:pointer;border:0;background:none;padding:0;-webkit-tap-highlight-color:transparent}
-  .wax svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
-  .wax canvas,.wax .shard{position:absolute;left:50%;top:50%;width:132px;height:132px;margin:-66px 0 0 -66px;pointer-events:none}
-  .wax canvas{filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
-  .wax.gl svg{visibility:hidden}
-  .wax .shard{background-size:100% 100%;transition:transform .9s cubic-bezier(.3,.6,.3,1),opacity .9s}
-  .wax .shard.l{clip-path:polygon(0 0,52% 0,46% 30%,54% 46%,47% 62%,53% 80%,49% 100%,0 100%)}
-  .wax .shard.r{clip-path:polygon(100% 0,52% 0,46% 30%,54% 46%,47% 62%,53% 80%,49% 100%,100% 100%)}
-  #seal.open .wax .shard.l{transform:translate(-30px,44px) rotate(-28deg);opacity:0}
-  #seal.open .wax .shard.r{transform:translate(30px,50px) rotate(24deg);opacity:0}
-  .wax .half{transition:transform .9s cubic-bezier(.3,.6,.3,1),opacity .9s}
-  #seal.open .wax .l{transform:translate(-26px,40px) rotate(-28deg);opacity:0}
-  #seal.open .wax .r{transform:translate(26px,46px) rotate(24deg);opacity:0}
-  .wax:not(:disabled){animation:waxPulse 2.4s ease-in-out infinite}
-  @keyframes waxPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.05)}}
-  .seal-cap{margin-top:34px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mint)}
+  .lock-wrap{position:relative;width:200px;height:410px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;outline:none}
+  .lock-wrap.dragging{cursor:grabbing}
+  .lock-svg{position:absolute;left:20px;top:0;width:160px;height:200px;overflow:visible;filter:drop-shadow(0 14px 24px rgba(0,0,0,.45))}
+  .lock-svg .shackle{transition:transform .45s cubic-bezier(.3,1.5,.5,1);transform-origin:115px 90px}
+  .lock-wrap.unlocked .shackle{transform:translateY(-20px) rotate(14deg)}
+  .lock-svg .glowring{opacity:0;transition:opacity .4s}
+  .lock-wrap.armed .glowring,.lock-wrap.unlocked .glowring{opacity:1}
+  .key-rail{position:absolute;left:0;top:150px;width:200px;height:260px;overflow:hidden;pointer-events:none}
+  #key{position:absolute;left:70px;top:110px;width:60px;height:150px;will-change:transform}
+  #key svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));transition:transform .32s ease-in}
+  .lock-wrap:not(.dragging):not(.armed):not(.busy) #key svg{animation:keyBob 1.8s ease-in-out infinite}
+  @keyframes keyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .lock-wrap.turn #key svg{transform:perspective(300px) rotateY(78deg)}
+  .chev{position:absolute;left:50%;top:205px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;transition:opacity .3s}
+  .chev i{width:12px;height:12px;border-left:2px solid var(--mint);border-top:2px solid var(--mint);transform:rotate(45deg);opacity:.15;animation:chev 1.5s infinite}
+  .chev i:nth-child(1){animation-delay:.3s}.chev i:nth-child(2){animation-delay:.15s}
+  @keyframes chev{0%,100%{opacity:.12}40%{opacity:.9}}
+  .lock-wrap.dragging .chev,.lock-wrap.armed .chev,.lock-wrap.busy .chev{opacity:0}
+  .seal-cap{margin-top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mint)}
   .seal-sub{margin-top:8px;font-size:13px;color:#8a97b2}
   .seal-skip{position:absolute;top:18px;right:20px;background:none;border:0;color:#5d6b85;font-family:var(--mono);font-size:12px;cursor:pointer}
+  @media (max-height:620px){ .lock-wrap{transform:scale(.84);margin:-30px 0} }
 
   /* ───── Boot screen ───── */
   #boot{position:fixed;inset:0;background:var(--navy);z-index:100;display:flex;justify-content:center;transition:opacity .8s ease, visibility .8s}
@@ -259,33 +254,33 @@
 <body>
 
 <!-- ═════════ BOOT / HANDSHAKE ═════════ -->
-<div id="seal" role="dialog" aria-label="봉인된 초대장">
+<div id="seal" role="dialog" aria-label="잠긴 초대장">
   <button class="seal-skip" id="sealSkip">SKIP ›</button>
-  <div class="env-wrap">
-    <div class="env">
-      <div class="body"></div>
-      <div class="flap"></div>
-      <button class="wax" id="waxBtn" aria-label="봉인을 눌러 초대장 열기">
-        <svg viewBox="-50 -50 100 100" aria-hidden="true">
-          <defs>
-            <radialGradient id="wg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".55" stop-color="#c9a24e"/><stop offset="1" stop-color="#8a6a26"/></radialGradient>
-            <clipPath id="cl"><path d="M-60 -60 L4 -60 L-6 -22 L6 -4 L-4 14 L5 34 L-2 60 L-60 60Z"/></clipPath>
-            <clipPath id="cr"><path d="M60 -60 L4 -60 L-6 -22 L6 -4 L-4 14 L5 34 L-2 60 L60 60Z"/></clipPath>
-            <g id="sealArt">
-              <path fill="url(#wg)" d="M0-46c7 0 9-5 15-3s6 8 12 10 11-1 14 4-2 10 0 16 7 9 5 15-8 6-10 12 1 11-4 14-10-2-16 0-9 7-16 7-9-5-15-3-7-1-10-6-11-2-14-6 2-9 0-15-7-9-5-15 8-7 10-12-1-11 4-14 10 2 16 0 9-7 16-7z"/>
-              <circle r="31" fill="none" stroke="#8a6a26" stroke-width="2" opacity=".55"/>
-              <circle r="26" fill="none" stroke="#fbeec4" stroke-width=".8" opacity=".5"/>
-              <text y="7" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="13" font-weight="700" fill="#7a5a1c">SH♥JY</text>
-            </g>
-          </defs>
-          <g class="half l" clip-path="url(#cl)"><use href="#sealArt"/></g>
-          <g class="half r" clip-path="url(#cr)"><use href="#sealArt"/></g>
-        </svg>
-      </button>
-    </div>
-    <div class="seal-cap">🔏 SEALED · INTEGRITY VERIFIED</div>
-    <div class="seal-sub">봉인을 눌러 초대장을 열어주세요</div>
+  <div class="lock-wrap" id="lockWrap" role="button" tabindex="0" aria-label="열쇠를 위로 올리거나 눌러서 초대장 열기">
+    <svg class="lock-svg" viewBox="0 0 160 200" aria-hidden="true">
+      <defs>
+        <linearGradient id="lkBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".5" stop-color="#cfa850"/><stop offset="1" stop-color="#8f6d28"/></linearGradient>
+        <linearGradient id="lkSteel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d98ad"/><stop offset=".45" stop-color="#e9eef6"/><stop offset="1" stop-color="#7c879c"/></linearGradient>
+      </defs>
+      <g class="shackle"><path d="M45 96 V62 a35 35 0 0 1 70 0 V96" fill="none" stroke="url(#lkSteel)" stroke-width="15" stroke-linecap="round"/></g>
+      <rect class="glowring" x="14" y="80" width="132" height="112" rx="20" fill="none" stroke="#3ddbb8" stroke-width="2.5" opacity=".9"/>
+      <rect x="20" y="86" width="120" height="100" rx="16" fill="url(#lkBody)"/>
+      <rect x="27" y="93" width="106" height="86" rx="11" fill="none" stroke="#fbeec4" stroke-opacity=".45" stroke-width="1"/>
+      <text x="80" y="111" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="11" font-weight="700" letter-spacing="2" fill="#7a5a1c">SH♥JY</text>
+      <circle cx="80" cy="134" r="10" fill="#1b1407"/><path d="M75.5 138 h9 l2.5 22 h-14z" fill="#1b1407"/>
+    </svg>
+    <div class="chev" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="key-rail"><div id="key">
+      <svg viewBox="0 0 60 150" aria-hidden="true">
+        <defs><linearGradient id="kyG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8923f"/><stop offset=".5" stop-color="#f6e2a6"/><stop offset="1" stop-color="#a47e30"/></linearGradient></defs>
+        <path d="M26 2 h8 v84 h-8z M34 14 h9 v8 h-9z M34 30 h13 v7 h-13z M34 44 h8 v8 h-8z" fill="url(#kyG)"/>
+        <circle cx="30" cy="114" r="24" fill="none" stroke="url(#kyG)" stroke-width="9"/>
+        <path d="M30 124 c-9 -7 -12 -11 -12 -15 a6 6 0 0 1 12 -3 a6 6 0 0 1 12 3 c0 4 -3 8 -12 15z" fill="url(#kyG)"/>
+      </svg>
+    </div></div>
   </div>
+  <div class="seal-cap" id="sealCap">🔒 LOCKED · PRIVATE KEY REQUIRED</div>
+  <div class="seal-sub" id="sealSub">열쇠를 위로 올려 잠금을 해제하세요</div>
 </div>
 
 <div id="boot" role="dialog" aria-label="초대장 여는 중">
@@ -437,7 +432,6 @@
 <audio id="bgm" loop preload="none" playsinline></audio>
 <button class="bgm-btn" id="bgmBtn" hidden aria-label="배경음악 켜기/끄기"><span class="bars"><i></i><i></i><i></i></span><span id="bgmLabel">BGM ON</span></button>
 
-<script src="wax-seal.js"></script>
 <script>
 /* ════════════════════════════════════════════
    ✏️  여기만 수정하면 됩니다 (CONFIG)
@@ -903,29 +897,38 @@ function confettiBurst(){
 $('#rsvpBtn').addEventListener('click',()=>confettiBurst());
 
 /* ── 봉랍 봉투 오프닝 (Wax Seal) → 터미널 ── */
-let sealOpened=false, waxGL=null;
-// 입체 금색 봉랍 (WebGL). 지원하지 않는 기기에서는 기존 SVG 봉랍이 그대로 보입니다.
-if(window.WaxSeal) WaxSeal.mount($('#waxBtn'),{text:'SH♥JY',color:'#E9BE4E',duration:1.6,reduced}).then(api=>{
-  if(!api) return;
-  if(sealOpened){ api.destroy(); return; }
-  waxGL=api; $('#waxBtn').classList.add('gl');
-}).catch(()=>{});
-function waxShatter(){
-  if(!waxGL) return;
-  const btn=$('#waxBtn'), url=waxGL.snapshot();
-  ['l','r'].forEach(k=>{ const d=document.createElement('div'); d.className='shard '+k; d.style.backgroundImage=`url(${url})`; btn.appendChild(d); });
-  waxGL.destroy(); waxGL=null; void btn.offsetWidth;
-}
+let sealOpened=false;
+const lockEl=$('#lockWrap'), keyEl=$('#key'), KEY_TRAVEL=155, KEY_ARM=112;
+let keyDrag=null, keyArmed=false;
+function setKey(y,anim){ keyEl.style.transition=anim?'transform .28s cubic-bezier(.3,1.2,.5,1)':'none'; keyEl.style.transform=`translateY(${-y}px)`; }
 function openSeal(skipAll){
   if(sealOpened) return; sealOpened=true;
-  const el=$('#seal'); $('#waxBtn').disabled=true;
-  bgmStart();                                    // 봉인 탭 = 사용자 동작 → BGM 자동재생 허용
-  if(skipAll){ if(waxGL) waxGL.destroy(); el.classList.add('gone'); finishBoot(); return; }
-  waxShatter();
-  el.classList.add('open');
-  setTimeout(()=>{ el.classList.add('gone'); runBoot(); }, reduced?0:1300);
+  const el=$('#seal');
+  bgmStart();                                    // 손을 뗀 순간 = 사용자 동작 → BGM 자동재생 허용
+  if(skipAll||reduced){ el.classList.add('gone'); skipAll?finishBoot():runBoot(); return; }
+  lockEl.classList.add('busy'); setKey(KEY_TRAVEL,true);           // 열쇠 삽입
+  setTimeout(()=>lockEl.classList.add('turn'),300);                // 열쇠 회전
+  setTimeout(()=>{ lockEl.classList.add('unlocked');               // 고리 열림
+    $('#sealCap').textContent='🔓 UNLOCKED'; $('#sealSub').textContent='초대장을 여는 중…'; },640);
+  setTimeout(()=>{ el.classList.add('gone'); runBoot(); },1550);
 }
-$('#waxBtn').onclick=()=>openSeal(false);
+const sealEl=$('#seal');   // 화면 어디서 끌어도 열쇠가 따라오도록 전체 화면에서 받음
+sealEl.addEventListener('pointerdown',e=>{ if(sealOpened||e.target.closest('#sealSkip')) return; keyDrag={y0:e.clientY,moved:false}; try{sealEl.setPointerCapture(e.pointerId);}catch(_){} lockEl.classList.add('dragging'); });
+sealEl.addEventListener('pointermove',e=>{
+  if(!keyDrag||sealOpened||keyArmed) return;
+  const dy=keyDrag.y0-e.clientY; if(Math.abs(dy)>8) keyDrag.moved=true;
+  const y=Math.max(0,Math.min(KEY_TRAVEL,dy));
+  if(y>=KEY_ARM){ keyArmed=true; setKey(KEY_TRAVEL,true); lockEl.classList.add('armed'); if(navigator.vibrate) try{navigator.vibrate(15);}catch(_){} }
+  else setKey(y,false);
+});
+sealEl.addEventListener('pointerup',()=>{
+  if(!keyDrag) return; const d=keyDrag; keyDrag=null; lockEl.classList.remove('dragging');
+  if(sealOpened) return;
+  if(keyArmed||!d.moved) openSeal(false);        // 끝까지 올렸거나, 그냥 눌렀을 때도 열림
+  else setKey(0,true);                           // 중간에 놓으면 제자리로
+});
+sealEl.addEventListener('pointercancel',()=>{ keyDrag=null; lockEl.classList.remove('dragging'); if(!keyArmed&&!sealOpened) setKey(0,true); });
+lockEl.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openSeal(false); } });
 $('#sealSkip').onclick=()=>openSeal(true);
 document.body.style.overflow='hidden';
 // 예식 이후 방문 시 축하 연출
