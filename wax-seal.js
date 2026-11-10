@@ -248,7 +248,7 @@
       size, logoImg: emblemCanvas(opt.text),
       relief: 0.45, irregularity: map(5, 0, 0.75), lobes: 8, shapeSeed: 0, rimWidth: 19,
       edgeCrest: 1, edgeRoundness: 0.9, wellDepth: map(10, 0, 3),
-      logoSize: 58, logoWeight: map(12, -1, 4), logoRelief: 0.6, logoBevel: 0.1, logoCrest: 1, logoRoundness: 0.4,
+      logoSize: 66, logoWeight: map(12, -1, 4), logoRelief: 0.6, logoBevel: 0.1, logoCrest: 1, logoRoundness: 0.4,
       showRings: true, ringCount: 1, ringSize: 62, ringSpacing: 6,
       ringRelief: 0.6, ringWidth: 1, ringPeak: 1, ringBevel: 0.2, ringCrest: 1, ringRoundness: 0.3,
     });

@@ -275,7 +275,7 @@
               <path fill="url(#wg)" d="M0-46c7 0 9-5 15-3s6 8 12 10 11-1 14 4-2 10 0 16 7 9 5 15-8 6-10 12 1 11-4 14-10-2-16 0-9 7-16 7-9-5-15-3-7-1-10-6-11-2-14-6 2-9 0-15-7-9-5-15 8-7 10-12-1-11 4-14 10 2 16 0 9-7 16-7z"/>
               <circle r="31" fill="none" stroke="#8a6a26" stroke-width="2" opacity=".55"/>
               <circle r="26" fill="none" stroke="#fbeec4" stroke-width=".8" opacity=".5"/>
-              <text y="7" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="19" font-weight="700" fill="#7a5a1c">S♥J</text>
+              <text y="7" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="13" font-weight="700" fill="#7a5a1c">SH♥JY</text>
             </g>
           </defs>
           <g class="half l" clip-path="url(#cl)"><use href="#sealArt"/></g>
@@ -905,7 +905,7 @@ $('#rsvpBtn').addEventListener('click',()=>confettiBurst());
 /* ── 봉랍 봉투 오프닝 (Wax Seal) → 터미널 ── */
 let sealOpened=false, waxGL=null;
 // 입체 금색 봉랍 (WebGL). 지원하지 않는 기기에서는 기존 SVG 봉랍이 그대로 보입니다.
-if(window.WaxSeal) WaxSeal.mount($('#waxBtn'),{text:'S♥J',color:'#E9BE4E',duration:1.6,reduced}).then(api=>{
+if(window.WaxSeal) WaxSeal.mount($('#waxBtn'),{text:'SH♥JY',color:'#E9BE4E',duration:1.6,reduced}).then(api=>{
   if(!api) return;
   if(sealOpened){ api.destroy(); return; }
   waxGL=api; $('#waxBtn').classList.add('gl');
