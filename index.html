@@ -93,6 +93,13 @@
   .hash-badge{display:inline-block;margin-top:22px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-family:var(--mono);font-size:10.5px;color:#7f8ca6}
 
   /* ───── Greeting ───── */
+  /* Scroll Text Reveal — 줄 마스크 안에서 글자가 아래에서 올라오며 흐림이 걷힘 */
+  .stl{overflow:hidden}
+  .stl .w{display:inline-block;white-space:nowrap}
+  .stl .c{display:inline-block;transform:translateY(105%);filter:blur(9px);will-change:transform,filter;
+    transition:transform var(--d,.45s) cubic-bezier(.45,0,.55,1) var(--t,0s),filter var(--d,.45s) cubic-bezier(.45,0,.55,1) var(--t,0s)}
+  #greeting.in .stl .c{transform:none;filter:blur(0)}
+  #greeting.noanim .stl .c{transition:none}
   .greet p{font-family:var(--serif);font-size:17px;line-height:2.1;color:#2b3345}
   .enc-head{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:22px;word-break:break-all}
   .parents{margin-top:36px;font-family:var(--serif);font-size:16px;line-height:2.2;color:#444c5e}
@@ -309,7 +316,7 @@
     <div class="label">Decrypted Message</div>
     <h2>초대합니다</h2>
     <div class="enc-head" id="encHead">AES-256-GCM · key = 두 사람의 마음</div>
-    <div class="reveal" id="greeting"></div>
+    <div id="greeting"></div>
     <div class="parents reveal" id="parents"></div>
   </section>
 
@@ -587,7 +594,7 @@ $('#skipBtn').onclick = finishBoot;
 
 /* ── Hero ── */
 function startHero(){
-  dotReveal();
+  dotReveal(); if(window.__greetCheck) setTimeout(window.__greetCheck,300);
   decrypt($('#heroDate'), `${fmtDate(W)} ${['SUN','MON','TUE','WED','THU','FRI','SAT'][W.getDay()]} ${pad(W.getHours())}:${pad(W.getMinutes())}`, 1100);
   decrypt($('#heroGroom'), CONFIG.groom.name, 1300);
   decrypt($('#heroBride'), CONFIG.bride.name, 1500);
@@ -599,37 +606,56 @@ if(CONFIG.mainPhoto){
   $('#heroPh').remove();
   heroImg=new Image(); heroImg.src=CONFIG.mainPhoto;
 }
+/* ASCII Reveal — Originkit "ASCII Reveal"을 바닐라 JS로 옮긴 것.
+   원본: 사진을 문자 밝기표(ramp)로 그리고 포인터 주변만 실제 사진으로 드러냄.
+   여기서는 ① 문자 그림이 터미널처럼 위에서부터 출력되고 ② 얼굴 위치에서 실제 사진이 번져 나오도록 시간축 연출로 바꿈. */
 function dotReveal(){
   const box=$('#heroPhoto'), cv=$('#dotReveal');
   if(!heroImg) return;
-  const finish=()=>{ box.style.backgroundImage=`url('${CONFIG.mainPhoto}')`; cv.style.transition='opacity .8s'; cv.style.opacity=0; };
+  const finish=()=>{ box.style.backgroundImage=`url('${CONFIG.mainPhoto}')`; cv.style.transition='opacity .6s'; cv.style.opacity=0; };
   if(reduced){ finish(); return; }
   const run=()=>{
+    const RAMP=' .:-=+*#%@', COLS=92, FOCUS_Y=0.22, PUNCH=0.5+(100/100)*2, INK='#3ddbb8';
     const dpr=Math.min(2,devicePixelRatio||1), W=box.clientWidth, H=box.clientHeight;
-    cv.width=W*dpr; cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
-    // cover-fit sample
-    const CELL=9, cols=Math.ceil(W/CELL), rows=Math.ceil(H/CELL);
-    const off=document.createElement('canvas'); off.width=cols; off.height=rows; const oc=off.getContext('2d');
-    const ir=heroImg.width/heroImg.height, br=W/H; let sw,sh,sx,sy;
-    if(ir>br){ sh=heroImg.height; sw=sh*br; sx=(heroImg.width-sw)/2; sy=0; } else { sw=heroImg.width; sh=sw/br; sx=0; sy=(heroImg.height-sh)*0.22; }
-    oc.drawImage(heroImg,sx,sy,sw,sh,0,0,cols,rows);
-    let px; try{ px=oc.getImageData(0,0,cols,rows).data; }catch(e){ finish(); return; }
-    const dots=[];
-    for(let y=0;y<rows;y++) for(let x=0;x<cols;x++){
-      const i=(y*cols+x)*4, d=Math.hypot(x-cols/2,y-rows*0.45)/Math.hypot(cols/2,rows/2);
-      dots.push({x:x*CELL+CELL/2,y:y*CELL+CELL/2,c:`rgb(${px[i]},${px[i+1]},${px[i+2]})`,t:d*0.9+Math.random()*0.35});
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); const ctx=cv.getContext('2d');
+    const cellW=cv.width/COLS, fontPx=cellW*1.7, cellH=fontPx, rows=Math.max(1,Math.floor(cv.height/cellH));
+    // cover 배치 (원본 placeRect)
+    const scale=Math.max(cv.width/heroImg.width,cv.height/heroImg.height), dw=heroImg.width*scale, dh=heroImg.height*scale;
+    const place={dx:(cv.width-dw)/2, dy:(cv.height-dh)*FOCUS_Y, dw, dh};
+    const sampler=document.createElement('canvas'); sampler.width=COLS; sampler.height=rows;
+    const sctx=sampler.getContext('2d',{willReadFrequently:true});
+    sctx.drawImage(heroImg,place.dx/cellW,place.dy/cellH,place.dw/cellW,place.dh/cellH);
+    let data; try{ data=sctx.getImageData(0,0,COLS,rows).data; }catch(e){ finish(); return; }
+    // 문자 그림을 한 번만 그려 둠
+    const off=document.createElement('canvas'); off.width=cv.width; off.height=cv.height; const octx=off.getContext('2d');
+    octx.fillStyle='#0b1220'; octx.fillRect(0,0,off.width,off.height);
+    octx.font=fontPx.toFixed(2)+'px "JetBrains Mono", ui-monospace, monospace'; octx.textBaseline='top'; octx.fillStyle=INK;
+    const last=RAMP.length-1;
+    for(let r=0;r<rows;r++) for(let c=0;c<COLS;c++){
+      const i=(r*COLS+c)*4; let lum=(0.299*data[i]+0.587*data[i+1]+0.114*data[i+2])/255;
+      lum=(lum-0.5)*PUNCH+0.5; lum=lum<0?0:lum>1?1:lum;
+      const ch=RAMP[Math.round(lum*last)]; if(ch!==' ') octx.fillText(ch,c*cellW,r*cellH);
     }
-    const T=1700, t0=performance.now();
+    const photo=document.createElement('canvas'); photo.width=cv.width; photo.height=cv.height; const pctx=photo.getContext('2d');
+    const T_PRINT=900, T_HOLD=350, T_BLOOM=1500, cx=cv.width*0.52, cy=cv.height*0.36, maxR=Math.hypot(cv.width,cv.height)*0.95;
+    const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, t0=performance.now();
     (function frame(now){
-      const p=(now-t0)/T; ctx.clearRect(0,0,W,H);
-      for(const o of dots){
-        const k=Math.min(1,Math.max(0,(p*1.4-o.t)/0.35)); if(k<=0) continue;
-        const r=(CELL*0.75)*k;
-        ctx.fillStyle = k<0.5 ? '#3ddbb8' : o.c;
-        if(k<1){ ctx.beginPath(); ctx.arc(o.x,o.y,r/2+0.6,0,Math.PI*2); ctx.fill(); }
-        else ctx.fillRect(o.x-CELL/2,o.y-CELL/2,CELL+.5,CELL+.5);
+      const t=now-t0; ctx.clearRect(0,0,cv.width,cv.height);
+      // ① 문자 그림 출력 (위 → 아래, 끝줄에 커서 띠)
+      const p1=Math.min(1,t/T_PRINT), yCut=Math.ceil(rows*p1)*cellH;
+      ctx.drawImage(off,0,0,cv.width,yCut,0,0,cv.width,yCut);
+      if(p1<1){ ctx.fillStyle='#0b1220'; ctx.fillRect(0,yCut,cv.width,cv.height-yCut); ctx.fillStyle='rgba(61,219,184,.55)'; ctx.fillRect(0,yCut,cv.width,Math.max(2,cellH*0.5)); }
+      // ② 실제 사진이 얼굴 위치에서 번져 나옴 (원본의 photo ∩ soft mask 합성)
+      const p2=Math.max(0,Math.min(1,(t-T_PRINT-T_HOLD)/T_BLOOM));
+      if(p2>0){
+        const R=maxR*easeIO(p2), soft=Math.max(40*dpr,R*0.35);
+        pctx.globalCompositeOperation='source-over'; pctx.clearRect(0,0,photo.width,photo.height);
+        pctx.drawImage(heroImg,place.dx,place.dy,place.dw,place.dh);
+        const g=pctx.createRadialGradient(cx,cy,Math.max(0,R-soft),cx,cy,R); g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(1,'rgba(255,255,255,0)');
+        pctx.globalCompositeOperation='destination-in'; pctx.fillStyle=g; pctx.fillRect(0,0,photo.width,photo.height);
+        ctx.drawImage(photo,0,0);
       }
-      if(p<1.25) requestAnimationFrame(frame); else finish();
+      if(p2<1) requestAnimationFrame(frame); else finish();
     })(t0);
   };
   heroImg.complete && heroImg.naturalWidth ? run() : (heroImg.onload=run, heroImg.onerror=finish);
@@ -658,7 +684,32 @@ function dotReveal(){
 })();
 
 /* ── Greeting / parents ── */
-$('#greeting').innerHTML = CONFIG.greeting.map(l=>`<p>${l||'&nbsp;'}</p>`).join('');
+/* Scroll Text Reveal — Originkit "Scroll Text Reveal"(gsap SplitText + framer-motion)을 라이브러리 없이 옮긴 것.
+   원본 계산식 그대로: 글자당 길이 = 전체×0.3, 간격 = (전체−글자당)/(글자수−1) */
+(function(){
+  const host=$('#greeting'), lines=CONFIG.greeting;
+  if(reduced){ host.innerHTML=lines.map(l=>`<p>${l||'&nbsp;'}</p>`).join(''); return; }
+  const TOTAL=1.5, per=TOTAL*0.3, chars=[];
+  lines.forEach(l=>{
+    const p=document.createElement('p');
+    if(!l){ p.innerHTML='&nbsp;'; host.appendChild(p); return; }
+    p.className='stl'; p.setAttribute('aria-label',l);
+    l.split(' ').forEach((word,wi,arr)=>{
+      const w=document.createElement('span'); w.className='w'; w.setAttribute('aria-hidden','true');
+      [...word].forEach(ch=>{ const c=document.createElement('span'); c.className='c'; c.textContent=ch; w.appendChild(c); chars.push(c); });
+      p.appendChild(w); if(wi<arr.length-1) p.appendChild(document.createTextNode(' '));
+    });
+    host.appendChild(p);
+  });
+  const stagger=chars.length>1?(TOTAL-per)/(chars.length-1):0;
+  chars.forEach((c,i)=>{ c.style.setProperty('--d',per.toFixed(3)+'s'); c.style.setProperty('--t',(i*stagger).toFixed(3)+'s'); });
+  let raf=0;
+  const check=()=>{ raf=0; const r=host.getBoundingClientRect(), vh=innerHeight;
+    if(r.top>vh){ if(host.classList.contains('in')){ host.classList.add('noanim'); host.classList.remove('in'); void host.offsetWidth; host.classList.remove('noanim'); } }   // 화면 아래로 완전히 벗어나면 초기화(원본 reverse)
+    else if(r.top+r.height*0.45<=vh && r.bottom>=0) host.classList.add('in'); };
+  addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(check); },{passive:true}); addEventListener('resize',check);
+  window.__greetCheck=check;
+})();
 const g=CONFIG.groom, b=CONFIG.bride;
 $('#parents').innerHTML =
   `${g.father} · ${g.mother} 의 ${g.order} <b>${g.name}</b><br>${b.father} · ${b.mother} 의 ${b.order} <b>${b.name}</b>`;
