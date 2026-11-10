@@ -20,27 +20,27 @@
   .lead{font-size:14px;color:var(--muted);margin-bottom:24px}
   .card{background:#fff;border:1px solid #e3ded3;border-radius:14px;padding:16px 16px 14px;text-align:left;margin-bottom:12px}
   .who{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}
-  .who .st{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:#b08a3a}
+  .who .st{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:#6b7385}
   .card.opened .who .st{color:var(--mint)}
-  .numwrap{position:relative;height:58px;border-radius:10px;background:
-      repeating-linear-gradient(135deg,rgba(11,18,32,.035) 0 8px,transparent 8px 16px),#fbfaf7;border:1px dashed #d8d2c4;
-      display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 14px}
-  .num{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+  .numwrap{position:relative;height:58px;border-radius:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='40'%3E%3Cg font-family='Arial,sans-serif' font-size='11' font-weight='700' letter-spacing='1.5' fill='rgba(11,18,32,.075)' transform='rotate(-10 66 20)'%3E%3Ctext x='-6' y='15'%3EVOID OPEN VOID OPEN%3C/text%3E%3Ctext x='-38' y='35'%3EVOID OPEN VOID OPEN%3C/text%3E%3C/g%3E%3C/svg%3E"),#f1f0ec;border:1px solid #dcd9d1;
+      display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 14px;overflow:visible}
+  .num{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.02em;color:var(--ink);background:rgba(241,240,236,.82);padding:2px 4px;margin-left:-4px;border-radius:3px}
   .copy{border:0;background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:11px;padding:8px 11px;border-radius:7px;cursor:pointer}
-  .void{position:absolute;right:66px;top:4px;font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:rgba(176,138,58,.55);opacity:0;transition:opacity .5s}
-  .card.opened .void{opacity:1}
   /* ── sticker ── */
   .stk{position:absolute;inset:-1px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;transition:opacity .35s}
   .stk.gone{opacity:0;pointer-events:none}
-  .stk .front,.stk .flap{position:absolute;inset:0;border-radius:10px}
+  .stk .front,.stk .flap{position:absolute;inset:0;border-radius:4px}
+  /* 무광 검정 봉인지: 얇은 은색 테두리선 + 넓은 자간의 명조 문구 */
   .stk .front{background:
-      repeating-linear-gradient(115deg,rgba(255,255,255,.0) 0 14px,rgba(255,255,255,.28) 14px 16px),
-      linear-gradient(120deg,#cfa850 0%,#f4e3ae 28%,#d9b45c 55%,#f6e8bb 78%,#c39a45 100%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 4px rgba(90,60,0,.25),0 2px 6px rgba(0,0,0,.12);
-    display:flex;align-items:center;justify-content:center;gap:8px;color:#5f4514;font-size:13.5px}
-  .stk .front b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;font-weight:600;border:1px solid rgba(95,69,20,.45);border-radius:4px;padding:2px 6px}
-  .stk .shadow{position:absolute;inset:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.28));pointer-events:none}
-  .stk .flap{background:linear-gradient(135deg,#fffdf6,#ece4cf 60%,#d9cfb6);transform-origin:0 0}
+      linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 40%,rgba(0,0,0,.18)),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),#22252c;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#d5d8de}
+  .stk .front::before{content:'';position:absolute;inset:4px;border:1px solid rgba(213,216,222,.28);border-radius:2px;pointer-events:none}
+  .stk .front .ko{font-family:var(--serif);font-size:14px;letter-spacing:.62em;margin-right:-.62em}
+  .stk .front .en{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:11px;letter-spacing:.08em;color:#9da2ad}
+  .stk .shadow{position:absolute;inset:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.35));pointer-events:none}
+  /* 뒷면: 은회색 접착면에 VOID 무늬 */
+  .stk .flap{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='40'%3E%3Cg font-family='Arial,sans-serif' font-size='11' font-weight='700' letter-spacing='1.5' fill='rgba(255,255,255,.5)' transform='rotate(-10 66 20)'%3E%3Ctext x='-6' y='15'%3EVOID OPEN VOID OPEN%3C/text%3E%3Ctext x='-38' y='35'%3EVOID OPEN VOID OPEN%3C/text%3E%3C/g%3E%3C/svg%3E"),linear-gradient(135deg,#d3d6dc,#a9aeb8 55%,#8b909b);transform-origin:0 0}
   .bar{margin-top:26px;display:flex;justify-content:center;gap:8px}
   .bar a,.bar button{font-family:var(--sans);font-size:12.5px;color:var(--ink);background:#fff;border:1px solid #d8d2c4;border-radius:999px;padding:9px 14px;text-decoration:none;cursor:pointer}
   .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:8px;opacity:0;transition:all .3s;pointer-events:none}
@@ -49,7 +49,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="tag">PREVIEW · TAMPER-EVIDENT SEAL</div>
+  <div class="tag">PREVIEW · SECURITY SEAL</div>
   <div class="label">● ENCRYPTED VAULT</div>
   <h2>마음 전하실 곳</h2>
   <p class="lead">봉인 스티커의 모서리를 당겨 떼어 주세요.</p>
@@ -67,8 +67,8 @@ function build(){
   ACCOUNTS.forEach(([who,num])=>{
     const card=document.createElement('div'); card.className='card';
     card.innerHTML=`<div class="who"><span>${who}</span><span class="st">🔏 SEALED</span></div>
-      <div class="numwrap"><span class="void">OPENED · VOID</span><span class="num">${num}</span><button class="copy">복사</button>
-      <div class="stk" role="button" tabindex="0" aria-label="봉인 스티커 떼기"><div class="front"><b>SEALED</b><span>모서리를 당겨 떼기 ↖</span></div><div class="shadow"><div class="flap"></div></div></div></div>`;
+      <div class="numwrap"><span class="num">${num}</span><button class="copy">복사</button>
+      <div class="stk" role="button" tabindex="0" aria-label="봉인 스티커 떼기"><div class="front"><span class="ko">봉인훼손유의</span><span class="en">Security</span></div><div class="shadow"><div class="flap"></div></div></div></div>`;
     host.appendChild(card);
     card.querySelector('.copy').onclick=async()=>{ try{ await navigator.clipboard.writeText(who.split('·')[1].trim()+' '+num); toast('✓ 복사되었습니다'); }catch(e){ toast(num); } };
     peelable(card);
