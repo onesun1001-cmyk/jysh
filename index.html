@@ -31,10 +31,10 @@
   body{background:#e9e5dc;font-family:var(--sans);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;word-break:keep-all}
   .app{max-width:440px;margin:0 auto;background:var(--paper);min-height:100vh;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.08)}
   .mono{font-family:var(--mono)}
-  section{padding:72px 28px;text-align:center;position:relative}
+  section{padding:42px 28px;text-align:center;position:relative}
   .label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--mint);text-transform:uppercase;margin-bottom:10px;display:inline-flex;gap:6px;align-items:center}
   .label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
-  h2{font-family:var(--serif);font-weight:600;font-size:22px;margin-bottom:28px;color:var(--ink)}
+  h2{font-family:var(--serif);font-weight:600;font-size:22px;margin-bottom:24px;color:var(--ink)}
   .divider{width:1px;height:48px;background:linear-gradient(var(--mint),transparent);margin:0 auto}
 
   /* ───── Opening: biometric scan → heart ───── */
@@ -230,6 +230,7 @@
   .transit dt span{font-family:var(--mono);font-size:10px;color:var(--mint);background:var(--navy);padding:2px 6px;border-radius:4px;margin-right:6px}
 
   /* ───── Accounts ───── */
+  .acc-group:last-child{margin-bottom:0}
   .acc-group{margin-bottom:12px;border:1px solid #e3ded3;border-radius:12px;background:#fff;text-align:left}
   .acc-head{padding:16px 18px;display:flex;justify-content:space-between;font-weight:500;font-size:15px}
   .acc-head .lock{font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -272,7 +273,7 @@
   .gb-item .nm{color:var(--mint);font-family:var(--sans);font-size:14px;font-weight:500}
   .gb-item .nm::before{content:'✓ ';color:var(--gold)}
   .gb-item .tx{margin-top:6px;color:#e8edf5;font-size:14.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-  .gb-empty{font-size:13px;color:var(--muted);text-align:center;padding:18px 0}
+  .gb-empty{font-size:13px;color:var(--muted);text-align:center;padding:14px 0 0}
   .contacts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .contact{background:#fff;border:1px solid #e3ded3;border-radius:12px;padding:16px 10px}
   .contact .role{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.1em}
