@@ -46,6 +46,14 @@
   #seal.open .env .flap{transform:rotateX(180deg);z-index:0}
   .wax{position:absolute;left:50%;top:62%;width:86px;height:86px;transform:translate(-50%,-50%);z-index:3;cursor:pointer;border:0;background:none;padding:0;-webkit-tap-highlight-color:transparent}
   .wax svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+  .wax canvas,.wax .shard{position:absolute;left:50%;top:50%;width:132px;height:132px;margin:-66px 0 0 -66px;pointer-events:none}
+  .wax canvas{filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+  .wax.gl svg{visibility:hidden}
+  .wax .shard{background-size:100% 100%;transition:transform .9s cubic-bezier(.3,.6,.3,1),opacity .9s}
+  .wax .shard.l{clip-path:polygon(0 0,52% 0,46% 30%,54% 46%,47% 62%,53% 80%,49% 100%,0 100%)}
+  .wax .shard.r{clip-path:polygon(100% 0,52% 0,46% 30%,54% 46%,47% 62%,53% 80%,49% 100%,100% 100%)}
+  #seal.open .wax .shard.l{transform:translate(-30px,44px) rotate(-28deg);opacity:0}
+  #seal.open .wax .shard.r{transform:translate(30px,50px) rotate(24deg);opacity:0}
   .wax .half{transition:transform .9s cubic-bezier(.3,.6,.3,1),opacity .9s}
   #seal.open .wax .l{transform:translate(-26px,40px) rotate(-28deg);opacity:0}
   #seal.open .wax .r{transform:translate(26px,46px) rotate(24deg);opacity:0}
@@ -429,6 +437,7 @@
 <audio id="bgm" loop preload="none" playsinline></audio>
 <button class="bgm-btn" id="bgmBtn" hidden aria-label="배경음악 켜기/끄기"><span class="bars"><i></i><i></i><i></i></span><span id="bgmLabel">BGM ON</span></button>
 
+<script src="wax-seal.js"></script>
 <script>
 /* ════════════════════════════════════════════
    ✏️  여기만 수정하면 됩니다 (CONFIG)
@@ -894,12 +903,25 @@ function confettiBurst(){
 $('#rsvpBtn').addEventListener('click',()=>confettiBurst());
 
 /* ── 봉랍 봉투 오프닝 (Wax Seal) → 터미널 ── */
-let sealOpened=false;
+let sealOpened=false, waxGL=null;
+// 입체 금색 봉랍 (WebGL). 지원하지 않는 기기에서는 기존 SVG 봉랍이 그대로 보입니다.
+if(window.WaxSeal) WaxSeal.mount($('#waxBtn'),{text:'S♥J',color:'#E9BE4E',duration:1.6,reduced}).then(api=>{
+  if(!api) return;
+  if(sealOpened){ api.destroy(); return; }
+  waxGL=api; $('#waxBtn').classList.add('gl');
+}).catch(()=>{});
+function waxShatter(){
+  if(!waxGL) return;
+  const btn=$('#waxBtn'), url=waxGL.snapshot();
+  ['l','r'].forEach(k=>{ const d=document.createElement('div'); d.className='shard '+k; d.style.backgroundImage=`url(${url})`; btn.appendChild(d); });
+  waxGL.destroy(); waxGL=null; void btn.offsetWidth;
+}
 function openSeal(skipAll){
   if(sealOpened) return; sealOpened=true;
   const el=$('#seal'); $('#waxBtn').disabled=true;
   bgmStart();                                    // 봉인 탭 = 사용자 동작 → BGM 자동재생 허용
-  if(skipAll){ el.classList.add('gone'); finishBoot(); return; }
+  if(skipAll){ if(waxGL) waxGL.destroy(); el.classList.add('gone'); finishBoot(); return; }
+  waxShatter();
   el.classList.add('open');
   setTimeout(()=>{ el.classList.add('gone'); runBoot(); }, reduced?0:1300);
 }
