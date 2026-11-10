@@ -66,6 +66,18 @@
   @keyframes blink{50%{opacity:0}}
   .granted{font-family:var(--mono);color:var(--mint);font-size:20px;letter-spacing:.2em;text-align:center;margin:24px 0 8px;opacity:0;transition:opacity .5s}
   .granted.show{opacity:1;text-shadow:0 0 18px rgba(61,219,184,.6)}
+  /* Glitch Text: 색이 어긋난 두 겹이 잘린 띠로 순간 번쩍임 */
+  .granted{position:relative}
+  .granted::before,.granted::after{content:attr(data-text);position:absolute;left:0;right:0;top:0;opacity:0;pointer-events:none;text-shadow:none}
+  .granted::before{color:#ff6b9d} .granted::after{color:#7fd4ff}
+  .granted.show::before{animation:glA 3.6s steps(1) .05s infinite}
+  .granted.show::after{animation:glB 3.6s steps(1) .05s infinite}
+  .granted.show{animation:glShake 3.6s steps(1) .05s infinite}
+  @keyframes glA{0%{opacity:.9;transform:translate(-3px,0);clip-path:inset(8% 0 58% 0)}3%{transform:translate(3px,-1px);clip-path:inset(62% 0 6% 0)}6%{transform:translate(-2px,1px);clip-path:inset(30% 0 40% 0)}9%{transform:translate(2px,0);clip-path:inset(72% 0 2% 0)}12%,100%{opacity:0}}
+  @keyframes glB{0%{opacity:.9;transform:translate(3px,1px);clip-path:inset(55% 0 12% 0)}3%{transform:translate(-3px,0);clip-path:inset(5% 0 70% 0)}6%{transform:translate(2px,-1px);clip-path:inset(42% 0 28% 0)}9%{transform:translate(-2px,0);clip-path:inset(15% 0 60% 0)}12%,100%{opacity:0}}
+  @keyframes glShake{0%{transform:translateX(1.5px)}3%{transform:translateX(-1.5px)}6%{transform:translateX(1px)}9%,100%{transform:none}}
+  #stars{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .cert-wrap > *:not(canvas){position:relative;z-index:1}
   .btn-open{margin:18px auto 0;display:block;width:100%;padding:16px;border:1px solid var(--mint);background:transparent;color:var(--mint);font-family:'Gowun Dodum',var(--sans);font-size:16.5px;letter-spacing:.03em;border-radius:10px;cursor:pointer;opacity:0;transform:translateY(8px);transition:all .5s}
   .btn-open.show{opacity:1;transform:none}
   .btn-open:active{background:rgba(61,219,184,.12)}
@@ -289,8 +301,8 @@
   <button class="skip" id="skipBtn">SKIP ›</button>
   <div class="boot-inner">
     <div class="term" id="term"></div>
-    <div class="granted" id="granted">ACCESS GRANTED</div>
-    <button class="btn-open" id="openBtn">🔓 초대장 복호화하기</button>
+    <div class="granted" id="granted" data-text="ACCESS GRANTED">ACCESS GRANTED</div>
+    <button class="btn-open" id="openBtn" aria-label="초대장 복호화하기"><span id="openIc" aria-hidden="true">🔒</span> <span id="openTxt" aria-hidden="true">초대장 복호화하기</span></button>
   </div>
 </div>
 
@@ -330,6 +342,7 @@
 
   <!-- ═════════ CERTIFICATE ═════════ -->
   <section class="cert-wrap">
+    <canvas id="stars" aria-hidden="true"></canvas>
     <div class="label">X.509 · Marriage Certificate</div>
     <h2>평생 인증서 발급 예정</h2>
     <div class="glow reveal"><div class="cert" id="cert"></div></div>
@@ -524,6 +537,21 @@ async function sha256(text){
 
 /* 스크램블 복호화 효과 */
 const GLYPHS = '0123456789abcdef#$%&@!?*+=<>/\\';
+/* Encrypt Button: 한글 버튼은 글자 폭이 흔들리지 않게 무작위 한글 음절로 뒤섞었다가 풀어 줌 */
+const BTN_TEXT='초대장 복호화하기'; let encBusy=false;
+function encryptBtn(dur){
+  const el=$('#openTxt'), ic=$('#openIc'); if(!el) return;
+  if(reduced){ el.textContent=BTN_TEXT; ic.textContent='🔓'; return; }
+  if(encBusy) return; encBusy=true; ic.textContent='🔒';
+  const t0=performance.now(), rnd=()=>String.fromCharCode(0xAC00+Math.floor(Math.random()*11172));
+  let last=0;
+  (function f(now){
+    const p=Math.min(1,(now-t0)/dur);
+    if(now-last>45||p>=1){ last=now; const fixed=Math.floor(p*BTN_TEXT.length); let out='';
+      for(let i=0;i<BTN_TEXT.length;i++){ const c=BTN_TEXT[i]; out+=(i<fixed||c===' ')?c:rnd(); } el.textContent=out; }
+    if(p<1) requestAnimationFrame(f); else { ic.textContent='🔓'; encBusy=false; }
+  })(t0);
+}
 function decrypt(el, text, dur=1200){
   if(reduced){ el.textContent=text; return; }
   const start = performance.now();
@@ -587,9 +615,10 @@ async function runBoot(){
   }
   const cur=document.createElement('span'); cur.className='cursor'; term.appendChild(cur);
   $('#granted').classList.add('show');
-  setTimeout(()=>$('#openBtn').classList.add('show'),400);
+  setTimeout(()=>{ $('#openBtn').classList.add('show'); encryptBtn(1100); },400);
 }
 $('#openBtn').onclick = finishBoot;
+$('#openBtn').addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') encryptBtn(500); });
 $('#skipBtn').onclick = finishBoot;
 
 /* ── Hero ── */
@@ -910,6 +939,34 @@ document.addEventListener('visibilitychange',()=>{     // 앱 전환·화면 꺼
   const days=Math.floor((today-new Date(start.toLocaleString('en-US',{timeZone:'Asia/Seoul'})))/86400000)+1;
   $('#uptime').innerHTML=`<div class="u"><b>${days.toLocaleString()}</b><span>함께한 날 (uptime)</span></div><div class="u"><b>100%</b><span>가용성 · 장애 0건*</span></div>`;
   $('#uptime').insertAdjacentHTML('afterend','<div class="ufoot">* 사소한 다툼은 모두 24시간 내 복구됨</div>');
+})();
+
+/* ── Constellation: 인증서 뒤 별자리. 금색 두 별(SH·JY)은 항상 이어져 있음 ── */
+(function(){
+  const cv=$('#stars'), box=cv.parentElement, ctx=cv.getContext('2d'); let W,H,pts=[],on=false,raf=0;
+  const N=34, LINK=92;
+  function size(){ const dpr=Math.min(2,devicePixelRatio||1); W=box.clientWidth; H=box.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  function init(){ size(); pts=Array.from({length:N},(_,i)=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:Math.random()*1.2+.6,tw:Math.random()*6.28,pair:i<2}));
+    pts[0].x=W*.3; pts[0].y=H*.12; pts[1].x=W*.7; pts[1].y=H*.16; }
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+    for(const p of pts){ if(step){ p.x+=p.vx; p.y+=p.vy; p.tw+=.03; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1; } }
+    // 두 별은 서로 너무 멀어지지 않게 살짝 끌어당김
+    if(step){ const a=pts[0], b=pts[1], dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1; if(d>170){ const k=(d-170)*.0006; a.vx+=dx/d*k; a.vy+=dy/d*k; b.vx-=dx/d*k; b.vy-=dy/d*k; }
+      for(const p of [a,b]){ const sp=Math.hypot(p.vx,p.vy); if(sp>.3){ p.vx*=.3/sp; p.vy*=.3/sp; } } }
+    ctx.lineWidth=1;
+    for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){ const a=pts[i], b=pts[j], d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(a.pair&&b.pair){ ctx.strokeStyle='rgba(232,201,138,.55)'; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+      else if(d<LINK){ ctx.strokeStyle=`rgba(61,219,184,${(1-d/LINK)*.22})`; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } }
+    for(const p of pts){ const a=p.pair?1:.35+Math.sin(p.tw)*.2;
+      ctx.fillStyle=p.pair?`rgba(232,201,138,${a})`:`rgba(160,235,220,${a})`; ctx.shadowColor=p.pair?'#e8c98a':'#3ddbb8'; ctx.shadowBlur=p.pair?10:4;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.pair?2.6:p.r,0,6.283); ctx.fill(); }
+    ctx.shadowBlur=0;
+  }
+  function loop(){ if(!on) return; draw(true); raf=requestAnimationFrame(loop); }
+  init(); draw(false);
+  addEventListener('resize',()=>{ size(); draw(false); });
+  if(!reduced) new IntersectionObserver(es=>{ const v=es[0].isIntersecting; if(v&&!on){ on=true; if(Math.abs(box.clientHeight-H)>4) init(); loop(); } else if(!v&&on){ on=false; cancelAnimationFrame(raf); } }).observe(box);
 })();
 
 /* ── 방명록 ── */
