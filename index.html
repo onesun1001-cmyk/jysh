@@ -230,15 +230,30 @@
   .transit dt span{font-family:var(--mono);font-size:10px;color:var(--mint);background:var(--navy);padding:2px 6px;border-radius:4px;margin-right:6px}
 
   /* ───── Accounts ───── */
-  .acc-group{margin-bottom:12px;border:1px solid #e3ded3;border-radius:12px;background:#fff;overflow:hidden;text-align:left}
-  .acc-group summary{list-style:none;padding:16px 18px;cursor:pointer;display:flex;justify-content:space-between;font-weight:500;font-size:15px}
-  .acc-group summary::-webkit-details-marker{display:none}
-  .acc-group summary .lock{font-family:var(--mono);font-size:11px;color:var(--muted)}
-  .acc-group[open] summary .lock{color:var(--mint)}
-  .acc{padding:14px 18px;border-top:1px solid #f0ece3;display:flex;justify-content:space-between;align-items:center;gap:10px}
-  .acc .who{font-size:13px;color:var(--muted)}
-  .acc .num{font-family:var(--mono);font-size:13.5px;color:var(--ink)}
+  .acc-group{margin-bottom:12px;border:1px solid #e3ded3;border-radius:12px;background:#fff;text-align:left}
+  .acc-head{padding:16px 18px;display:flex;justify-content:space-between;font-weight:500;font-size:15px}
+  .acc-head .lock{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .acc-group.opened .acc-head .lock{color:var(--mint)}
+  .acc{padding:12px 18px 14px;border-top:1px solid #f0ece3}
+  .acc .who{font-size:13px;color:var(--muted);margin-bottom:7px}
+  /* 스티커를 뗀 자리: 회색 VOID OPEN 흔적 */
+  .numwrap{position:relative;height:52px;border-radius:6px;border:1px solid #dcd9d1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='40'%3E%3Cg font-family='Arial,sans-serif' font-size='11' font-weight='700' letter-spacing='1.5' fill='rgba(11,18,32,.075)' transform='rotate(-10 66 20)'%3E%3Ctext x='-6' y='15'%3EVOID OPEN VOID OPEN%3C/text%3E%3Ctext x='-38' y='35'%3EVOID OPEN VOID OPEN%3C/text%3E%3C/g%3E%3C/svg%3E"),#f1f0ec;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 9px 0 13px}
+  .acc .num{font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--ink);background:rgba(241,240,236,.82);padding:2px 4px;margin-left:-4px;border-radius:3px}
   .acc button{flex:0 0 auto;border:1px solid var(--navy);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:7px;cursor:pointer}
+  /* 봉인 스티커 (자체 구현) — 세로 스크롤은 그대로, 가로로 당기거나 탭하면 떼어짐 */
+  .stk{position:absolute;inset:-1px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:opacity .35s;line-height:1.25}
+  .stk.gone{opacity:0;pointer-events:none}
+  .stk .front,.stk .flap{position:absolute;inset:0;border-radius:4px}
+  .stk .front{background:
+      linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 40%,rgba(0,0,0,.18)),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),#22252c;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#d5d8de}
+  .stk .front::before{content:'';position:absolute;inset:4px;border:1px solid rgba(213,216,222,.28);border-radius:2px;pointer-events:none}
+  .stk .front .ko{font-family:var(--serif);font-size:14px;letter-spacing:.62em;margin-right:-.62em}
+  .stk .front .en{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:11px;letter-spacing:.08em;color:#9da2ad}
+  .stk .shadow{position:absolute;inset:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.35));pointer-events:none}
+  .stk .flap{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='40'%3E%3Cg font-family='Arial,sans-serif' font-size='11' font-weight='700' letter-spacing='1.5' fill='rgba(255,255,255,.5)' transform='rotate(-10 66 20)'%3E%3Ctext x='-6' y='15'%3EVOID OPEN VOID OPEN%3C/text%3E%3Ctext x='-38' y='35'%3EVOID OPEN VOID OPEN%3C/text%3E%3C/g%3E%3C/svg%3E"),linear-gradient(135deg,#d3d6dc,#a9aeb8 55%,#8b909b);transform-origin:0 0}
 
   /* ───── Contacts / RSVP / Footer ───── */
   .gb-form{position:relative;background:#fff;border:1px solid #e3ded3;border-radius:14px;padding:14px;text-align:left}
@@ -420,7 +435,7 @@
   <section>
     <div class="label">Encrypted Vault</div>
     <h2>마음 전하실 곳</h2>
-    <p style="font-size:14px;color:var(--muted);margin:-14px 0 24px">탭하면 복호화됩니다.</p>
+    <p style="font-size:14px;color:var(--muted);margin:-14px 0 24px">봉인 스티커를 떼면 계좌번호가 보입니다.</p>
     <div id="accounts"></div>
   </section>
 
@@ -849,15 +864,62 @@ const tel=p=>p.replace(/[^0-9]/g,'');
 $('#contacts').innerHTML = [['GROOM',g],['BRIDE',b]].map(([r,p])=>
   `<div class="contact"><div class="role">${r}</div><div class="nm">${p.name}</div><a href="tel:${tel(p.phone)}">전화</a><a href="sms:${tel(p.phone)}">문자</a></div>`).join('');
 
-/* ── Accounts (masked → decrypt on tap) ── */
+/* ── Accounts (봉인 스티커를 떼면 공개) ── */
 const mask=n=>n.replace(/[0-9]/g,'•');
 $('#accounts').innerHTML = [['신랑측','groom'],['신부측','bride']].map(([t,k])=>
-  `<details class="acc-group"><summary>${t} 계좌<span class="lock">🔒 LOCKED</span></summary>`+
-  CONFIG.accounts[k].map((a,i)=>`<div class="acc"><div><div class="who">${a.who} · ${a.bank}</div><div class="num" data-num="${a.num}">${mask(a.num)}</div></div><button data-copy="${a.bank} ${a.num}">복사</button></div>`).join('')+
-  `</details>`).join('');
-document.querySelectorAll('.acc-group').forEach(d=>d.addEventListener('toggle',()=>{
-  d.querySelector('.lock').textContent = d.open?'🔓 DECRYPTED':'🔒 LOCKED';
-  d.querySelectorAll('.num').forEach(n=> d.open ? decrypt(n,n.dataset.num,700) : n.textContent=mask(n.dataset.num));
+  `<div class="acc-group"><div class="acc-head">${t} 계좌<span class="lock">🔏 SEALED</span></div>`+
+  CONFIG.accounts[k].map(a=>`<div class="acc"><div class="who">${a.who} · ${a.bank}</div><div class="numwrap"><span class="num" data-num="${a.num}">${mask(a.num)}</span><button data-copy="${a.bank} ${a.num}" disabled>복사</button>`+
+    `<div class="stk" role="button" tabindex="0" aria-label="${a.who} 계좌 봉인 스티커 떼기"><div class="front"><span class="ko">봉인훼손유의</span><span class="en">Security</span></div><div class="shadow"><div class="flap"></div></div></div></div></div>`).join('')+
+  `</div>`).join('');
+/* 스티커 접기: 모서리 C와 손가락 P의 중점을 지나는 접는 선을 기준으로
+   앞면은 선 안쪽만 남기고(clip), 넘어간 부분은 선에 대해 반사시켜 뒷면(flap)으로 그림 */
+function peelable(card,onOpen){
+  const stk=card.querySelector('.stk'), front=stk.querySelector('.front'), flap=stk.querySelector('.flap');
+  let w=0,h=0,P=null,drag=null,done=false,anim=0;
+  const measure=()=>{ w=stk.clientWidth; h=stk.clientHeight; };
+  const clipHalf=(poly,M,n,keepNeg)=>{            // Sutherland–Hodgman, 반평면으로 자르기
+    const side=p=>((p[0]-M[0])*n[0]+(p[1]-M[1])*n[1])*(keepNeg?1:-1), out=[];
+    for(let i=0;i<poly.length;i++){ const a=poly[i], b=poly[(i+1)%poly.length], sa=side(a), sb=side(b);
+      if(sa<=0) out.push(a);
+      if((sa<0&&sb>0)||(sa>0&&sb<0)){ const t=sa/(sa-sb); out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]); } }
+    return out; };
+  const toClip=poly=>poly.length?`polygon(${poly.map(p=>p[0].toFixed(1)+'px '+p[1].toFixed(1)+'px').join(',')})`:'polygon(0 0,0 0,0 0)';
+  function render(){
+    const C=[w,h], dx=C[0]-P[0], dy=C[1]-P[1], d=Math.hypot(dx,dy);
+    if(d<1){ front.style.clipPath='none'; flap.style.display='none'; return; }
+    const n=[dx/d,dy/d], M=[(C[0]+P[0])/2,(C[1]+P[1])/2], u=[-n[1],n[0]], rect=[[0,0],[w,0],[w,h],[0,h]];
+    front.style.clipPath=toClip(clipHalf(rect,M,n,true));
+    const removed=clipHalf(rect,M,n,false);
+    flap.style.display=removed.length?'block':'none'; flap.style.clipPath=toClip(removed);
+    const a=2*u[0]*u[0]-1, b=2*u[0]*u[1], c=b, dd=2*u[1]*u[1]-1, e=M[0]-(a*M[0]+c*M[1]), f=M[1]-(b*M[0]+dd*M[1]);
+    flap.style.transform=`matrix(${a},${b},${c},${dd},${e},${f})`;
+  }
+  const rest=()=>[w-15,h-11];                      // 살짝 들린 모서리(힌트)
+  function tween(to,ms,cb){ cancelAnimationFrame(anim); const from=P.slice(), t0=performance.now();
+    (function f(now){ const t=Math.min(1,(now-t0)/ms), e=1-Math.pow(1-t,3); P=[from[0]+(to[0]-from[0])*e,from[1]+(to[1]-from[1])*e]; render();
+      if(t<1) anim=requestAnimationFrame(f); else cb&&cb(); })(t0); }
+  function finish(){ if(done) return; done=true;
+    const off=()=>{ stk.classList.add('gone'); stk.setAttribute('aria-hidden','true'); stk.tabIndex=-1; if(navigator.vibrate) try{navigator.vibrate(12);}catch(_){ } onOpen&&onOpen(); };
+    reduced?off():tween([-w*0.9,-h*2.4],420,off); }
+  measure(); P=rest(); render();
+  // 오프닝 동안에는 화면이 숨겨져 크기가 0이므로, 크기가 잡힐 때마다 다시 계산
+  new ResizeObserver(()=>{ if(done||drag) return; measure(); if(w){ P=rest(); render(); } }).observe(stk);
+  stk.addEventListener('pointerdown',e=>{ if(done) return; cancelAnimationFrame(anim); const r=stk.getBoundingClientRect();
+    drag={ox:e.clientX-r.left-P[0], oy:e.clientY-r.top-P[1], moved:false, x0:e.clientX, y0:e.clientY}; try{stk.setPointerCapture(e.pointerId);}catch(_){ } });
+  stk.addEventListener('pointermove',e=>{ if(!drag||done) return; const r=stk.getBoundingClientRect();
+    if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6) drag.moved=true;
+    // 어디를 잡아도 모서리가 손가락 이동량만큼 따라오게 함
+    P=[Math.min(w,rest()[0]+(e.clientX-drag.x0)), Math.min(h,rest()[1]+(e.clientY-drag.y0))]; render();
+    if(Math.hypot(w-P[0],h-P[1])>Math.hypot(w,h)*0.62) finish(); });
+  const up=()=>{ if(!drag) return; const d=drag; drag=null; if(done) return; if(!d.moved) finish(); else tween(rest(),260); };
+  stk.addEventListener('pointerup',up); stk.addEventListener('pointercancel',()=>{ drag=null; if(!done) tween(rest(),260); });
+  stk.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); finish(); } });
+}
+document.querySelectorAll('.acc').forEach(row=>peelable(row,()=>{
+  const n=row.querySelector('.num'); row.classList.add('opened'); row.querySelector('button').disabled=false;
+  reduced ? n.textContent=n.dataset.num : decrypt(n,n.dataset.num,600);
+  const g=row.closest('.acc-group');
+  if(!g.querySelector('.acc:not(.opened)')){ g.classList.add('opened'); g.querySelector('.lock').textContent='🔓 OPENED'; }
 }));
 document.addEventListener('click',async e=>{
   const btn=e.target.closest('[data-copy]'); if(!btn) return;
