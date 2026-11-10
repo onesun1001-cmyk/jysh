@@ -22,6 +22,7 @@
     --serif:'Noto Serif KR',serif; --sans:'Noto Sans KR',system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
   html{scroll-behavior:smooth}
   body{background:#e9e5dc;font-family:var(--sans);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;word-break:keep-all}
   .app{max-width:440px;margin:0 auto;background:var(--paper);min-height:100vh;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.08)}
@@ -237,6 +238,23 @@
   .acc button{flex:0 0 auto;border:1px solid var(--navy);background:var(--navy);color:var(--mint);font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:7px;cursor:pointer}
 
   /* ───── Contacts / RSVP / Footer ───── */
+  .gb-form{position:relative;background:#fff;border:1px solid #e3ded3;border-radius:14px;padding:14px;text-align:left}
+  .gb-form input[type=text],.gb-form textarea{width:100%;border:1px solid #e3ded3;border-radius:10px;padding:11px 12px;font-family:var(--sans);font-size:15px;color:var(--ink);background:#fbfaf7;outline:none;resize:none}
+  .gb-form input[type=text]:focus,.gb-form textarea:focus{border-color:var(--mint);box-shadow:0 0 0 3px rgba(61,219,184,.15)}
+  .gb-form textarea{margin-top:8px;line-height:1.6}
+  .gb-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+  .gb-row .btn-main{width:auto;margin:0;padding:12px 20px;font-size:14px}
+  .gb-row .btn-main:disabled{opacity:.5}
+  .gb-count{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .gb-note{margin-top:10px;font-size:12px;color:var(--muted)}
+  .gb-list{margin-top:18px;display:flex;flex-direction:column;gap:10px;text-align:left}
+  .gb-item{background:var(--navy);border-radius:12px;padding:14px 16px;animation:gbIn .5s ease both}
+  @keyframes gbIn{from{opacity:0;transform:translateY(8px)}}
+  .gb-item .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:var(--mono);font-size:11px;color:#7f8ca6}
+  .gb-item .nm{color:var(--mint);font-family:var(--sans);font-size:14px;font-weight:500}
+  .gb-item .nm::before{content:'✓ ';color:var(--gold)}
+  .gb-item .tx{margin-top:6px;color:#e8edf5;font-size:14.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .gb-empty{font-size:13px;color:var(--muted);text-align:center;padding:18px 0}
   .contacts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .contact{background:#fff;border:1px solid #e3ded3;border-radius:12px;padding:16px 10px}
   .contact .role{font-family:var(--mono);font-size:10px;color:var(--mint);letter-spacing:.1em}
@@ -411,6 +429,22 @@
     <div id="accounts"></div>
   </section>
 
+  <!-- ═════════ GUESTBOOK ═════════ -->
+  <section id="guestbook">
+    <div class="label">Guest Log</div>
+    <h2>방명록</h2>
+    <p style="font-size:14px;color:var(--muted);margin:-14px 0 22px">축하의 한마디를 남겨 주세요. 모두가 함께 볼 수 있어요.</p>
+    <form class="gb-form" id="gbForm" autocomplete="off">
+      <input id="gbName" type="text" maxlength="20" placeholder="이름" aria-label="이름" required>
+      <textarea id="gbMsg" maxlength="300" rows="3" placeholder="축하 메시지 (300자 이내)" aria-label="축하 메시지" required></textarea>
+      <input id="gbHp" type="text" name="website" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      <div class="gb-row"><span class="gb-count" id="gbCount">0 / 300</span><button class="btn-main" id="gbSend" type="submit">서명 남기기</button></div>
+    </form>
+    <div class="gb-note" id="gbNote" hidden></div>
+    <div class="gb-list" id="gbList" aria-live="polite"></div>
+    <button class="btn-main btn-sub" id="gbMore" hidden>이전 글 더 보기</button>
+  </section>
+
   <!-- ═════════ RSVP / SHARE ═════════ -->
   <section style="background:#efebe2">
     <div class="label">Access Request</div>
@@ -422,7 +456,8 @@
 
   <footer>
     <div>This invitation is protected by <b>Love-256</b></div>
-    <div>개인정보 수집 0건 · 쿠키 0개 · 트래커 0개</div>
+    <div>쿠키 0개 · 트래커 0개</div>
+    <div>방명록에는 남기신 이름과 글만 저장됩니다</div>
     <div id="footHash"></div>
   </footer>
 </main>
@@ -481,6 +516,9 @@ const CONFIG = {
   // 배경음악: audio/ 폴더에 mp3를 넣고 경로 입력. 비워두면 BGM 버튼이 숨겨집니다.
   bgm: 'audio/bgm.mp3',   // ⚠ 임시 자작곡 — 원하는 곡으로 교체 가능
   bgmVolume: 0.5,
+
+  // 방명록: Google Apps Script 웹 앱 URL (tools/GUESTBOOK.md 참고). 비워두면 이 기기에만 저장되는 체험 모드.
+  guestbookUrl: '',
 
   rsvpUrl: '#',   // 구글폼 등 참석 회신 링크
 };
@@ -846,6 +884,53 @@ document.addEventListener('visibilitychange',()=>{     // 앱 전환·화면 꺼
   const days=Math.floor((today-new Date(start.toLocaleString('en-US',{timeZone:'Asia/Seoul'})))/86400000)+1;
   $('#uptime').innerHTML=`<div class="u"><b>${days.toLocaleString()}</b><span>함께한 날 (uptime)</span></div><div class="u"><b>100%</b><span>가용성 · 장애 0건*</span></div>`;
   $('#uptime').insertAdjacentHTML('afterend','<div class="ufoot">* 사소한 다툼은 모두 24시간 내 복구됨</div>');
+})();
+
+/* ── 방명록 ── */
+(function(){
+  const URL_=CONFIG.guestbookUrl, list=$('#gbList'), form=$('#gbForm'), nameI=$('#gbName'), msgI=$('#gbMsg'), send=$('#gbSend'), more=$('#gbMore');
+  const PAGE=10, LS='jysh_gb_demo'; let items=[], shown=PAGE;
+  const fmt=ts=>{ const d=new Date(ts); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  function render(){
+    list.textContent='';
+    if(!items.length){ const e=document.createElement('div'); e.className='gb-empty'; e.textContent='첫 번째 축하 메시지를 남겨 주세요 ✍️'; list.appendChild(e); }
+    items.slice(0,shown).forEach(it=>{            // 글은 반드시 textContent로만 넣음 (스크립트 삽입 방지)
+      const el=document.createElement('div'); el.className='gb-item';
+      const hd=document.createElement('div'); hd.className='hd';
+      const nm=document.createElement('span'); nm.className='nm'; nm.textContent=it.name;
+      const tm=document.createElement('span'); tm.textContent=fmt(it.ts);
+      const tx=document.createElement('div'); tx.className='tx'; tx.textContent=it.msg;
+      hd.append(nm,tm); el.append(hd,tx); list.appendChild(el);
+    });
+    more.hidden=items.length<=shown;
+  }
+  const local={ get(){ try{ return JSON.parse(localStorage.getItem(LS)||'[]'); }catch(e){ return []; } },
+                add(it){ try{ localStorage.setItem(LS,JSON.stringify([it,...local.get()].slice(0,50))); }catch(e){} } };
+  async function load(){
+    if(!URL_){ items=local.get(); $('#gbNote').hidden=false; $('#gbNote').textContent='※ 방명록 저장소 연결 전이라, 지금 남기는 글은 이 기기에서만 보입니다.'; render(); return; }
+    try{ const r=await fetch(URL_,{cache:'no-store'}); const j=await r.json(); if(j.ok) items=j.items||[]; }
+    catch(e){ $('#gbNote').hidden=false; $('#gbNote').textContent='방명록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.'; }
+    render();
+  }
+  msgI.addEventListener('input',()=>{ $('#gbCount').textContent=`${msgI.value.length} / 300`; });
+  more.onclick=()=>{ shown+=PAGE; render(); };
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name=nameI.value.trim().slice(0,20), msg=msgI.value.trim().slice(0,300);
+    if(!name||!msg){ toast('이름과 메시지를 모두 적어 주세요'); return; }
+    send.disabled=true; send.textContent='기록 중…';
+    let it={ts:Date.now(),name,msg}, ok=true;
+    if(URL_){
+      try{ const r=await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({name,msg,website:$('#gbHp').value})});
+           const j=await r.json(); ok=!!j.ok; if(j.item) it=j.item; if(!ok) toast(j.error==='busy'?'지금 글이 몰리고 있어요. 잠시 후 다시 시도해 주세요':'등록하지 못했어요'); }
+      catch(err){ ok=false; toast('등록하지 못했어요. 연결을 확인해 주세요'); }
+    } else local.add(it);
+    send.disabled=false; send.textContent='서명 남기기';
+    if(!ok) return;
+    items.unshift(it); msgI.value=''; $('#gbCount').textContent='0 / 300'; render(); confettiBurst(); toast('✓ 방명록에 기록되었습니다');
+  });
+  // 방명록 근처까지 스크롤했을 때 불러옴
+  new IntersectionObserver((es,ob)=>{ if(es.some(x=>x.isIntersecting)){ ob.disconnect(); load(); } },{rootMargin:'600px 0px'}).observe($('#guestbook'));
 })();
 
 /* ── 캘린더 저장 (.ics / Google) ── */
