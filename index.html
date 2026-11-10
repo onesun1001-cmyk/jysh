@@ -33,44 +33,24 @@
   h2{font-family:var(--serif);font-weight:600;font-size:22px;margin-bottom:28px;color:var(--ink)}
   .divider{width:1px;height:48px;background:linear-gradient(var(--mint),transparent);margin:0 auto}
 
-  /* ───── Padlock opening: drag the key up ───── */
-  #seal{touch-action:none;position:fixed;inset:0;z-index:110;background:radial-gradient(120% 80% at 50% 30%,#16213a,#0b1220 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s}
+  /* ───── Opening: biometric scan → heart ───── */
+  #seal{position:fixed;inset:0;z-index:110;background:radial-gradient(120% 80% at 50% 28%,#172340,#0b1220 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
   #seal.gone{opacity:0;visibility:hidden}
-  .lock-wrap{position:relative;width:200px;height:410px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;outline:none}
-  .lock-wrap.dragging{cursor:grabbing}
-  .lock-wrap{perspective:720px}
-  .lock-shadow{position:absolute;left:34px;top:176px;width:132px;height:30px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(13px)}
-  .lock3d{position:absolute;left:20px;top:0;width:160px;height:200px;transform-style:preserve-3d;transform:rotateX(5deg) rotateY(var(--ry,-16deg))}
-  .lock3d .bl{position:absolute;left:20px;top:86px;width:120px;height:100px;border-radius:16px;background:linear-gradient(90deg,#b18b3c,#7a5a1d 55%,#5d4312);backface-visibility:hidden}
-  .lock3d .bl.back{background:#6b4e17;backface-visibility:visible}
-  .lock3d .face{background:linear-gradient(135deg,#f8e7b0 0%,#d9b45c 42%,#b28a37 78%,#8f6d28 100%);
-    box-shadow:inset 0 2px 1px rgba(255,255,255,.6),inset 2px 0 1px rgba(255,255,255,.25),inset 0 -5px 9px rgba(80,50,0,.38),inset -3px 0 6px rgba(80,50,0,.22);transition:box-shadow .35s}
-  .lock3d .face::before{content:'';position:absolute;inset:7px;border-radius:10px;border:1px solid rgba(255,244,205,.55);box-shadow:inset 0 1px 2px rgba(90,60,0,.4),0 1px 0 rgba(90,60,0,.25)}
-  .lock3d .face::after{content:'';position:absolute;left:8px;top:6px;width:70px;height:34px;border-radius:12px 30px 40px 10px;background:linear-gradient(160deg,rgba(255,255,255,.5),rgba(255,255,255,0) 70%);pointer-events:none}
-  .lock3d .eng{position:absolute;left:0;right:0;top:13px;text-align:center;font-family:var(--serif);font-size:11px;font-weight:700;letter-spacing:2px;color:#73531a;text-shadow:0 1px 0 rgba(255,246,214,.7),0 -1px 0 rgba(70,45,0,.35)}
-  .lock3d .kh{position:absolute;left:46px;top:36px;width:28px;height:44px;filter:drop-shadow(0 1px 0 rgba(255,244,205,.6))}
-  .lock-wrap.armed .face,.lock-wrap.unlocked .face{box-shadow:inset 0 2px 1px rgba(255,255,255,.6),inset 0 -5px 9px rgba(80,50,0,.38),0 0 0 2.5px #3ddbb8,0 0 28px rgba(61,219,184,.6)}
-  .shackle3d{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:115px 60px;transition:transform .55s cubic-bezier(.3,1.4,.5,1)}
-  .shackle3d .shk{position:absolute;left:0;top:0;width:160px;height:200px;overflow:visible}
-  .lock-wrap.unlocked .shackle3d{transform:translateY(-22px) rotateY(-64deg)}
-  .key-rail{position:absolute;left:0;top:150px;width:200px;height:260px;overflow:hidden;pointer-events:none}
-  #key{position:absolute;left:70px;top:110px;width:60px;height:150px;will-change:transform}
-  #key{perspective:520px}
-  .keybob,.key3d{position:absolute;inset:0;transform-style:preserve-3d}
-  .key3d{transform:rotateY(var(--ry,-16deg));transition:transform .34s ease-in}
-  .key3d svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-  .lock-wrap:not(.dragging):not(.armed):not(.busy) .keybob{animation:keyBob 1.8s ease-in-out infinite}
-  @keyframes keyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-  .lock-wrap.turn .key3d{transform:rotateY(96deg)}
-  .chev{position:absolute;left:50%;top:205px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;transition:opacity .3s}
-  .chev i{width:12px;height:12px;border-left:2px solid var(--mint);border-top:2px solid var(--mint);transform:rotate(45deg);opacity:.15;animation:chev 1.5s infinite}
-  .chev i:nth-child(1){animation-delay:.3s}.chev i:nth-child(2){animation-delay:.15s}
-  @keyframes chev{0%,100%{opacity:.12}40%{opacity:.9}}
-  .lock-wrap.dragging .chev,.lock-wrap.armed .chev,.lock-wrap.busy .chev{opacity:0}
-  .seal-cap{margin-top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mint)}
-  .seal-sub{margin-top:8px;font-size:13px;color:#8a97b2}
+  .fpbox{position:relative;display:flex;align-items:center;justify-content:center;outline:none}
+  #fp{width:260px;height:300px;display:block;cursor:pointer}
+  .fpring{position:absolute;width:250px;height:250px;border-radius:50%;border:1px solid rgba(61,219,184,.35);animation:fprip 2.4s ease-out infinite;pointer-events:none}
+  .fpring.b{animation-delay:1.2s}
+  @keyframes fprip{0%{transform:scale(.72);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+  #seal.holding .fpring,#seal.fp-ok .fpring{display:none}
+  .seal-cap{margin-top:26px;font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--mint);transition:color .6s;min-height:16px}
+  .seal-sub{margin-top:9px;font-size:13.5px;color:#8a97b2;min-height:20px}
+  #seal.fp-ok .seal-cap{color:var(--gold)}
+  #seal.nudge .seal-sub{animation:fpnudge .5s}
+  @keyframes fpnudge{0%,100%{transform:none;color:#8a97b2}30%{transform:scale(1.08);color:#fff}}
+  .seal-names{font-family:var(--serif);font-size:20px;color:#fff;letter-spacing:.06em;margin-top:14px;opacity:0;transform:translateY(8px);transition:opacity .8s .2s,transform .8s .2s}
+  .seal-names b{color:var(--gold);font-weight:400;margin:0 8px}
+  #seal.fp-ok .seal-names{opacity:1;transform:none}
   .seal-skip{position:absolute;top:18px;right:20px;background:none;border:0;color:#5d6b85;font-family:var(--mono);font-size:12px;cursor:pointer}
-  @media (max-height:620px){ .lock-wrap{transform:scale(.84);margin:-30px 0} }
 
   /* ───── Boot screen ───── */
   #boot{position:fixed;inset:0;background:var(--navy);z-index:100;display:flex;justify-content:center;transition:opacity .8s ease, visibility .8s}
@@ -285,21 +265,12 @@
 <body>
 
 <!-- ═════════ BOOT / HANDSHAKE ═════════ -->
-<div id="seal" role="dialog" aria-label="잠긴 초대장">
+<div id="seal" role="dialog" aria-label="하객 인증">
   <button class="seal-skip" id="sealSkip">SKIP ›</button>
-  <div class="lock-wrap" id="lockWrap" role="button" tabindex="0" aria-label="열쇠를 위로 올리거나 눌러서 초대장 열기">
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-      <linearGradient id="lkSteel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7d889d"/><stop offset=".3" stop-color="#f4f7fb"/><stop offset=".55" stop-color="#b9c2d2"/><stop offset="1" stop-color="#6c778c"/></linearGradient>
-      <linearGradient id="kyG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8923f"/><stop offset=".45" stop-color="#fbeab5"/><stop offset="1" stop-color="#a47e30"/></linearGradient>
-    </defs></svg>
-    <div class="lock-shadow"></div>
-    <div class="lock3d" id="lock3d" aria-hidden="true"></div>
-    <div class="chev" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="key-rail"><div id="key"><div class="keybob"><div class="key3d" id="key3d" aria-hidden="true"></div></div>
-    </div></div>
-  </div>
-  <div class="seal-cap" id="sealCap">🔒 LOCKED · PRIVATE KEY REQUIRED</div>
-  <div class="seal-sub" id="sealSub">열쇠를 위로 올려 잠금을 해제하세요</div>
+  <div class="fpbox" id="fpBox" role="button" tabindex="0" aria-label="지문을 길게 눌러 초대장 열기"><div class="fpring"></div><div class="fpring b"></div><canvas id="fp"></canvas></div>
+  <div class="seal-cap" id="sealCap">BIOMETRIC AUTH REQUIRED</div>
+  <div class="seal-sub" id="sealSub">지문을 길게 눌러 인증하세요</div>
+  <div class="seal-names">박상현<b>♥</b>윤지윤</div>
 </div>
 
 <div id="boot" role="dialog" aria-label="초대장 여는 중">
@@ -983,59 +954,75 @@ function confettiBurst(){
 $('#rsvpBtn').addEventListener('click',()=>confettiBurst());
 
 /* ── 봉랍 봉투 오프닝 (Wax Seal) → 터미널 ── */
+/* ── 오프닝: 지문 스캔 → 하트 ── */
 let sealOpened=false;
-/* 3D 자물쇠·열쇠: 얇은 판을 깊이 방향으로 겹쳐 실제 두께를 만들고, 좌우로 천천히 돌려 입체감을 냄 */
-(function build3d(){
-  let h='<div class="shackle3d">';
-  for(let i=0;i<7;i++) h+=`<svg class="shk" viewBox="0 0 160 200" style="transform:translateZ(${6-i*2}px)"><path d="M45 100 V62 a35 35 0 0 1 70 0 V100" fill="none" stroke="${i===0?'url(#lkSteel)':i<3?'#a3adbf':'#667187'}" stroke-width="15" stroke-linecap="round"/></svg>`;
-  h+='</div>';
-  for(let i=12;i>=1;i--) h+=`<div class="bl${i===12?' back':''}" style="transform:translateZ(${12-i*2}px)"></div>`;
-  h+='<div class="bl face" style="transform:translateZ(12px)"><span class="eng">SH♥JY</span><svg class="kh" viewBox="0 0 28 44"><circle cx="14" cy="12" r="11.5" fill="#8a6a26"/><path d="M8.5 16h11l3 26h-17z" fill="#8a6a26"/><circle cx="14" cy="12" r="10" fill="#150f04"/><path d="M9.5 16h9l2.5 24h-14z" fill="#150f04"/></svg></div>';
-  $('#lock3d').innerHTML=h;
-  let k='';
-  for(let i=4;i>=0;i--) k+=`<svg viewBox="0 0 60 150" style="transform:translateZ(${4-i*2}px)"><g fill="${i===0?'url(#kyG)':'#80601f'}"><path d="M26 2 h8 v84 h-8z M34 14 h9 v8 h-9z M34 30 h13 v7 h-13z M34 44 h8 v8 h-8z"/><path fill-rule="evenodd" d="M30 86 a28 28 0 1 0 .01 0z M30 96 a18 18 0 1 1 -.01 0z"/><path d="M30 124 c-9 -7 -12 -11 -12 -15 a6 6 0 0 1 12 -3 a6 6 0 0 1 12 3 c0 4 -3 8 -12 15z"/></g></svg>`;
-  $('#key3d').innerHTML=k;
+(function(){
+  const sealEl=$('#seal'), cv=$('#fp'), ctx=cv.getContext('2d');
+  const Wc=260,Hc=300,dpr=Math.min(2.5,devicePixelRatio||1); cv.width=Wc*dpr; cv.height=Hc*dpr; ctx.scale(dpr,dpr);
+  const N=9, cx=130, cy=168, HOLD=1500, MORPH=reduced?1:1100;
+  const DELTA=[1.25,0.25,0.95,0.5,1.05,0.35,0.85,0.55,0.72];
+  const GAPS={2:[0.30,0.37],4:[0.70,0.76],5:[0.62,0.70],7:[0.14,0.20],8:[0.44,0.49]};
+  const ridges=[];
+  for(let i=0;i<N;i++){ const g=GAPS[i], mid=g?(g[0]+g[1])/2:0;
+    ridges.push({rx:12+i*12.5,ry:(12+i*12.5)*1.2,d:DELTA[i],segs:g?[[0,g[0]],[g[1],1]]:[[0,1]],tgt:g?[[0,mid],[mid,1]]:[[0,1]],s:(i+1)/N*6.3}); }
+  const lerp=(a,b,t)=>a+(b-a)*t, ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const fpPoint=(r,t)=>{ const ph=(Math.PI+r.d)-t*(Math.PI+2*r.d); return [cx+r.rx*Math.cos(ph), cy-r.ry*Math.sin(ph)]; };
+  const heartPoint=(r,t)=>{ const u=Math.PI+2*Math.PI*t;
+    return [cx+r.s*16*Math.pow(Math.sin(u),3), 142-r.s*(13*Math.cos(u)-5*Math.cos(2*u)-2*Math.cos(3*u)-Math.cos(4*u))]; };
+  function strokeAll(m,alpha,color,blur){
+    ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=3.1; ctx.strokeStyle=color; ctx.globalAlpha=alpha; ctx.shadowColor=color; ctx.shadowBlur=blur;
+    const e=ease(m);
+    for(const r of ridges) r.segs.forEach((sg,k)=>{ const tg=r.tgt[k], n=64; ctx.beginPath();
+      for(let j=0;j<=n;j++){ const q=j/n, a=fpPoint(r,lerp(sg[0],sg[1],q)), b=heartPoint(r,lerp(tg[0],tg[1],q));
+        const x=lerp(a[0],b[0],e), y=lerp(a[1],b[1],e); j?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+      ctx.stroke(); });
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+  }
+  const mix=m=>`rgb(${[61,219,184].map((v,i)=>Math.round(lerp(v,[232,201,138][i],m))).join(',')})`;
+  let hold=0, morph=0, holding=false, done=false, tDone=0, last=performance.now(), alive=true, leaving=false, downAt=0;
+  function leave(skip){
+    if(leaving) return; leaving=true; sealOpened=true;
+    sealEl.classList.add('gone'); setTimeout(()=>alive=false,900);
+    skip?finishBoot():runBoot();
+  }
+  function frame(now){
+    if(!alive) return;
+    const dt=now-last; last=now;
+    if(!done){
+      hold=Math.max(0,Math.min(1,hold+(holding?dt/HOLD:-dt/500)));
+      $('#sealCap').textContent=holding?`SCANNING… ${String(Math.round(hold*100)).padStart(2,'0')}%`:'BIOMETRIC AUTH REQUIRED';
+      if(hold>=1){ done=true; tDone=now; if(navigator.vibrate) try{navigator.vibrate([20,40,30]);}catch(_){}
+        sealEl.classList.remove('holding');
+        $('#sealCap').textContent='IDENTITY VERIFIED'; $('#sealSub').textContent='소중한 분, 환영합니다'; }
+    } else {
+      morph=Math.min(1,(now-tDone)/MORPH);
+      if(morph>=.5) sealEl.classList.add('fp-ok');
+      if(now-tDone>MORPH+1300) leave(false);
+    }
+    ctx.clearRect(0,0,Wc,Hc); ctx.save();
+    if(done&&morph>=1){ const b=1+Math.sin((now-tDone-MORPH)/420)*0.022; ctx.translate(cx,150); ctx.scale(b,b); ctx.translate(-cx,-150); }
+    if(done) strokeAll(morph,1,mix(ease(morph)),10+8*morph);
+    else{
+      strokeAll(0,0.32+Math.sin(now/600)*0.06,'#3ddbb8',0);
+      if(hold>0){ const y=Hc-hold*Hc; ctx.save(); ctx.beginPath(); ctx.rect(0,y,Wc,Hc-y); ctx.clip(); strokeAll(0,1,'#3ddbb8',12); ctx.restore();
+        const g=ctx.createLinearGradient(0,y-26,0,y+3); g.addColorStop(0,'rgba(61,219,184,0)'); g.addColorStop(1,'rgba(61,219,184,.55)');
+        ctx.fillStyle=g; ctx.fillRect(18,y-26,Wc-36,28); ctx.fillStyle='#d6fff4'; ctx.fillRect(18,y,Wc-36,1.6); }
+    }
+    ctx.restore();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  sealEl.addEventListener('pointerdown',e=>{ if(done||e.target.closest('#sealSkip')) return; holding=true; downAt=performance.now(); sealEl.classList.add('holding'); });
+  const up=()=>{
+    if(done) bgmStart();                         // 손을 뗀 순간 = 사용자 동작 → BGM 자동재생 허용
+    else if(holding&&performance.now()-downAt<350){ sealEl.classList.remove('nudge'); void sealEl.offsetWidth; sealEl.classList.add('nudge'); }  // 짧게 누르면 안내 강조
+    holding=false; sealEl.classList.remove('holding');
+  };
+  addEventListener('pointerup',up); addEventListener('pointercancel',()=>{ holding=false; sealEl.classList.remove('holding'); });
+  sealEl.addEventListener('contextmenu',e=>e.preventDefault());
+  $('#fpBox').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!done){ e.preventDefault(); hold=1; } });
+  $('#sealSkip').onclick=()=>leave(true);
 })();
-let swayOn=!reduced, swayAmp=22; const sway0=performance.now();
-(function sway(now){
-  if(!swayOn) return;
-  const busy=$('#lockWrap').classList.contains('busy');
-  swayAmp+=((busy?9:22)-swayAmp)*.1;
-  $('#lockWrap').style.setProperty('--ry',(Math.sin((now-sway0)/1150)*swayAmp).toFixed(2)+'deg');
-  requestAnimationFrame(sway);
-})(sway0);
-const lockEl=$('#lockWrap'), keyEl=$('#key'), KEY_TRAVEL=155, KEY_ARM=112;
-let keyDrag=null, keyArmed=false;
-function setKey(y,anim){ keyEl.style.transition=anim?'transform .28s cubic-bezier(.3,1.2,.5,1)':'none'; keyEl.style.transform=`translateY(${-y}px)`; }
-function openSeal(skipAll){
-  if(sealOpened) return; sealOpened=true;
-  const el=$('#seal');
-  bgmStart();                                    // 손을 뗀 순간 = 사용자 동작 → BGM 자동재생 허용
-  if(skipAll||reduced){ swayOn=false; el.classList.add('gone'); skipAll?finishBoot():runBoot(); return; }
-  lockEl.classList.add('busy'); setKey(KEY_TRAVEL,true);           // 열쇠 삽입
-  setTimeout(()=>lockEl.classList.add('turn'),300);                // 열쇠 회전
-  setTimeout(()=>{ lockEl.classList.add('unlocked');               // 고리 열림
-    $('#sealCap').textContent='🔓 UNLOCKED'; $('#sealSub').textContent='초대장을 여는 중…'; },640);
-  setTimeout(()=>{ el.classList.add('gone'); runBoot(); setTimeout(()=>swayOn=false,800); },1650);
-}
-const sealEl=$('#seal');   // 화면 어디서 끌어도 열쇠가 따라오도록 전체 화면에서 받음
-sealEl.addEventListener('pointerdown',e=>{ if(sealOpened||e.target.closest('#sealSkip')) return; keyDrag={y0:e.clientY,moved:false}; try{sealEl.setPointerCapture(e.pointerId);}catch(_){} lockEl.classList.add('dragging'); });
-sealEl.addEventListener('pointermove',e=>{
-  if(!keyDrag||sealOpened||keyArmed) return;
-  const dy=keyDrag.y0-e.clientY; if(Math.abs(dy)>8) keyDrag.moved=true;
-  const y=Math.max(0,Math.min(KEY_TRAVEL,dy));
-  if(y>=KEY_ARM){ keyArmed=true; setKey(KEY_TRAVEL,true); lockEl.classList.add('armed'); if(navigator.vibrate) try{navigator.vibrate(15);}catch(_){} }
-  else setKey(y,false);
-});
-sealEl.addEventListener('pointerup',()=>{
-  if(!keyDrag) return; const d=keyDrag; keyDrag=null; lockEl.classList.remove('dragging');
-  if(sealOpened) return;
-  if(keyArmed||!d.moved) openSeal(false);        // 끝까지 올렸거나, 그냥 눌렀을 때도 열림
-  else setKey(0,true);                           // 중간에 놓으면 제자리로
-});
-sealEl.addEventListener('pointercancel',()=>{ keyDrag=null; lockEl.classList.remove('dragging'); if(!keyArmed&&!sealOpened) setKey(0,true); });
-lockEl.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openSeal(false); } });
-$('#sealSkip').onclick=()=>openSeal(true);
 document.body.style.overflow='hidden';
 // 예식 이후 방문 시 축하 연출
 if(new Date()>W) setTimeout(confettiBurst,1800);
